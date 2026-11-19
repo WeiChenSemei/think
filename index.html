@@ -367,15 +367,24 @@
                 ]
             },
             'labyrinth_2': {
-                title: "眾生相",
-                text: () => "<span class='glow-white text-xl'>【諸相非相迷宮 - 第二層：眾生相】</span><br><br>迷宮深處，億萬生靈的哀嚎與歡呼匯聚成洪流，將你淹沒。你感受到所有人的愛恨情仇。",
+                title: "人相",
+                text: () => "<span class='glow-cyan text-xl'>【諸相非相迷宮 - 第二層：人相】</span><br><br>長廊另一端走來一個與你截然不同，卻又息息相關的『他人』。他指責你的過錯，讚美你的美德，強烈的情感羈絆化作無形的牆壁。",
                 choices: [
-                    { text: "被洪流吞噬，沉溺於眾生的恩怨", action: () => { state.att += 4; return 'labyrinth_3'; } },
-                    { text: "發下宏願，願承載痛苦，度化眾生", action: () => { state.mer += 4; return 'labyrinth_3'; } },
-                    { text: "「無眾生相。」悲憫而不執著", action: () => { state.enl += 4; state.hiddenScore += 1; return 'labyrinth_3'; } }
+                    { text: "與之辯論，證明自己的對錯", action: () => { state.att += 4; return 'labyrinth_3'; } },
+                    { text: "生起慈悲，接納對方的愛恨", action: () => { state.mer += 4; return 'labyrinth_3'; } },
+                    { text: "「無人相。」明白自他本無分別", action: () => { state.enl += 4; return 'labyrinth_3'; } }
                 ]
             },
             'labyrinth_3': {
+                title: "眾生相",
+                text: () => "<span class='glow-purple text-xl'>【諸相非相迷宮 - 第三層：眾生相】</span><br><br>迷宮深處，億萬生靈的哀嚎與歡呼匯聚成洪流，將你淹沒。你感受到所有人的愛恨情仇。",
+                choices: [
+                    { text: "被洪流吞噬，沉溺於眾生的恩怨", action: () => { state.att += 4; return 'labyrinth_4'; } },
+                    { text: "發下宏願，願承載痛苦，度化眾生", action: () => { state.mer += 4; return 'labyrinth_4'; } },
+                    { text: "「無眾生相。」悲憫而不執著", action: () => { state.enl += 4; state.hiddenScore += 1; return 'labyrinth_4'; } }
+                ]
+            },
+            'labyrinth_4': {
                 title: "壽者相",
                 text: () => "<span class='glow-white text-xl'>【諸相非相迷宮 - 終點：壽者相】</span><br><br>時間實體化為一尊發光的神明。祂手持沙漏：<br>「跪拜我，賜你永生；否定我，化為灰燼。」",
                 choices: [
@@ -491,6 +500,101 @@
                 { text: "殺死巨獸以絕後患", action: () => { state.att += 4; return 'next_random'; } },
                 { text: "默默繞道而行", action: () => { state.enl += 2; return 'next_random'; } },
                 { text: "割肉餵食野獸", action: () => { state.mer += 5; return 'next_random'; } }
+            ]},
+            'subhuti_tears': { title: "聞涕泣", text: "<span class='glow-cyan text-lg'>【深解義趣】</span><br><br>一位長者聽聞了真言，感動得痛哭流涕，淚水化作滿地珍珠。", choices: [
+                { text: "收集珍珠", action: () => { state.att += 3; return 'next_random'; } },
+                { text: "「法尚應捨，何況涕泣？」", action: () => { state.enl += 4; return 'next_random'; } },
+                { text: "與之同泣，悲憫眾生尋法之苦", action: () => { state.mer += 3; return 'next_random'; } }
+            ]},
+            'sound_form': { title: "音聲相", text: "<span class='glow-gold text-lg'>【以色見我】</span><br><br>虛空中傳來梵音與絕美的光芒，聲音呼喚你：「我乃真神，速來皈依。」", choices: [
+                { text: "虔誠追隨光芒與梵音", action: () => { state.att += 4; return 'next_random'; } },
+                { text: "「若以色見我，以音聲求我，不能見如來。」", action: () => { state.enl += 5; return 'next_random'; } },
+                { text: "心生讚嘆，但不迷失", action: () => { state.mer += 2; state.enl += 2; return 'next_random'; } }
+            ]},
+            'dream_bubble': { title: "夢幻泡", text: "<span class='glow-purple text-lg'>【如夢幻泡影】</span><br><br>你看到一個晶瑩的泡沫，裡面裝著一個繁華的宇宙，正緩緩飄向荊棘。", choices: [
+                { text: "伸手護住泡沫，害怕它破裂", action: () => { state.att += 3; state.mer += 2; return 'next_random'; } },
+                { text: "靜觀其生滅，如夢幻泡影", action: () => { state.enl += 4; return 'next_random'; } },
+                { text: "【隱藏】隨泡沫一同破滅", cond: (s)=>s.loop>=1, action: () => { state.enl += 3; state.hiddenScore += 1; return 'next_random'; } }
+            ]},
+            'dew_lightning': { title: "露與電", text: "<span class='glow-white text-lg'>【如露亦如電】</span><br><br>剎那間，九天落雷劈下，草葉上的朝露瞬間蒸發。生滅只在電光石火之間。", choices: [
+                { text: "驚恐於無常的迅猛", action: () => { state.att += 3; return 'next_random'; } },
+                { text: "「應作如是觀。」", action: () => { state.enl += 4; return 'next_random'; } },
+                { text: "化作春雨，再次潤澤大地", action: () => { state.mer += 4; return 'next_random'; } }
+            ]},
+            'false_buddha': { title: "三十二", text: "<span class='glow-gold text-lg'>【三十二相】</span><br><br>一尊具備三十二種莊嚴瑞相的金色大佛降臨，威壓宇宙，要你臣服。", choices: [
+                { text: "頂禮膜拜，求賜福報", action: () => { state.att += 4; return 'next_random'; } },
+                { text: "「若以三十二相見如來者，轉輪聖王即是如來。」", action: () => { state.enl += 5; return 'next_random'; } },
+                { text: "【隱藏】無相之相，方為實相", cond: (s)=>s.enl>=10, action: () => { state.enl += 4; state.hiddenScore+=1; return 'next_random'; } }
+            ]},
+            'no_dharmas': { title: "無法得", text: "<span class='glow-cyan text-lg'>【實無有法】</span><br><br>一本散發無上光芒的無字天書飄落在你面前，傳說得到它就能獲得至高智慧。", choices: [
+                { text: "狂喜地搶奪天書", action: () => { state.att += 4; return 'next_random'; } },
+                { text: "「實無有法，如來得阿耨多羅三藐三菩提。」", action: () => { state.enl += 4; return 'next_random'; } },
+                { text: "翻開天書，為眾生宣說", action: () => { state.mer += 4; return 'next_random'; } }
+            ]},
+            'begging_bowl': { title: "洗缽盂", text: "<span class='glow-white text-lg'>【著衣持缽】</span><br><br>一位老者托缽乞食歸來，平靜地吃完飯，收起衣缽，洗淨雙足，於樹下敷座而坐。", choices: [
+                { text: "覺得平凡無奇，轉身離開", action: () => { state.att += 2; return 'next_random'; } },
+                { text: "從日常穿衣吃飯中，悟得清淨本心", action: () => { state.enl += 5; return 'next_random'; } },
+                { text: "上前供養老者", action: () => { state.mer += 3; return 'next_random'; } }
+            ]},
+            'lion_roar': { title: "獅子吼", text: "<span class='glow-gold text-lg'>【獅子吼】</span><br><br>一頭黃金獅子發出震動十方世界的咆哮，所有幻象在吼聲中片片碎裂。", choices: [
+                { text: "掩耳驚懼，害怕失去自身存在", action: () => { state.att += 3; return 'next_random'; } },
+                { text: "與獅子同吼，震碎一切執著", action: () => { state.enl += 4; return 'next_random'; } },
+                { text: "安撫獅子，讓其聲音化為梵音渡人", action: () => { state.mer += 4; return 'next_random'; } }
+            ]},
+            'poison_arrow': { title: "毒箭傷", text: "<span class='glow-red text-lg'>【毒箭戲論】</span><br><br>一名旅人身中劇毒之箭，卻不肯拔箭，非要追問是誰射的、弓是什麼木頭做的。", choices: [
+                { text: "幫他追查兇手", action: () => { state.att += 3; return 'next_random'; } },
+                { text: "直接將箭拔出，不作戲論", action: () => { state.enl += 4; return 'next_random'; } },
+                { text: "吸出毒血，捨身相救", action: () => { state.mer += 5; return 'next_random'; } }
+            ]},
+            'lotus_fire': { title: "火中蓮", text: "<span class='glow-red text-lg'>【火中生蓮】</span><br><br>烈焰沖天的劫火爐中，竟然綻放出一朵清涼、純白無瑕的蓮花。", choices: [
+                { text: "試圖摘下蓮花據為己有", action: () => { state.att += 4; return 'next_random'; } },
+                { text: "明白煩惱即菩提，於火中得清涼", action: () => { state.enl += 4; return 'next_random'; } },
+                { text: "引導烈火中的苦難靈魂步上蓮花", action: () => { state.mer += 4; return 'next_random'; } }
+            ]},
+            'karmic_wind': { title: "業風吹", text: "<span class='glow-purple text-lg'>【宿業狂風】</span><br><br>一陣黑色的狂風吹過，風中夾帶著你無數前世造下的罪業與善行，企圖將你捲走。", choices: [
+                { text: "緊抓善行，抗拒罪業", action: () => { state.att += 3; return 'next_random'; } },
+                { text: "「罪性本空由心造。」任風吹過", action: () => { state.enl += 4; return 'next_random'; } },
+                { text: "乘風而行，前往最深沉的地獄救贖", action: () => { state.mer += 5; return 'next_random'; } }
+            ]},
+            'mind_mirror': { title: "明心鏡", text: "<span class='glow-cyan text-lg'>【無邊心鏡】</span><br><br>一面沒有邊際的古鏡，你往裡看，卻什麼也看不到，連自己的倒影也沒有。", choices: [
+                { text: "感到恐慌，不斷尋找自己的影子", action: () => { state.att += 4; return 'next_random'; } },
+                { text: "「本來無一物，何處惹塵埃。」", action: () => { state.enl += 5; return 'next_random'; } },
+                { text: "【隱藏】打破鏡面，讓虛空粉碎", chance: 0.5, action: () => { state.enl += 3; state.hiddenScore += 1; return 'next_random'; } }
+            ]},
+            'empty_throne': { title: "空法座", text: "<span class='glow-gold text-lg'>【無上法座】</span><br><br>宇宙的中心有一座空蕩蕩的蓮花寶座，散發出統御萬法的誘人氣息。", choices: [
+                { text: "坐上寶座，成為法界之王", action: () => { state.att += 5; return 'next_random'; } },
+                { text: "知道法座亦是空花，不為所動", action: () => { state.enl += 4; return 'next_random'; } },
+                { text: "將寶座讓給其他修行者", action: () => { state.mer += 3; return 'next_random'; } }
+            ]},
+            'sutra_tower': { title: "經文塔", text: "<span class='glow-white text-lg'>【萬卷法執】</span><br><br>一座高塔由億萬卷經文堆砌而成，每卷經文都在訴說不同的真理，互相爭辯不休。", choices: [
+                { text: "鑽研所有經文，企圖找出絕對真理", action: () => { state.att += 4; return 'next_random'; } },
+                { text: "「所謂佛法者，即非佛法。」", action: () => { state.enl += 5; return 'next_random'; } },
+                { text: "為爭辯的經文們調解", action: () => { state.mer += 2; return 'next_random'; } }
+            ]},
+            'blind_turtle': { title: "盲龜木", text: "<span class='glow-cyan text-lg'>【盲龜浮木】</span><br><br>在無邊的苦海中，一隻千年才浮出水面一次的盲龜，正努力尋找一塊有孔的浮木。", choices: [
+                { text: "慶幸自己不是那隻盲龜", action: () => { state.att += 3; return 'next_random'; } },
+                { text: "感嘆人身難得，佛法難聞", action: () => { state.enl += 3; return 'next_random'; } },
+                { text: "化作浮木，讓盲龜得以棲息", action: () => { state.mer += 5; return 'next_random'; } }
+            ]},
+            'kalpa_fire': { title: "大劫火", text: "<span class='glow-red text-lg'>【宇宙劫火】</span><br><br>宇宙迎來了末日，星辰崩塌，劫火將一切有形之物燒成灰燼。", choices: [
+                { text: "拼命用法力保護自己的珍寶", action: () => { state.att += 5; return 'next_random'; } },
+                { text: "明白成住壞空乃自然法則", action: () => { state.enl += 4; return 'next_random'; } },
+                { text: "【隱藏】以清涼心化解業火", cond: (s)=>s.loop>=2, action: () => { state.enl += 3; state.mer += 3; state.hiddenScore += 1; return 'next_random'; } }
+            ]},
+            'formless_dragon': { title: "無相龍", text: "<span class='glow-purple text-lg'>【無相之相】</span><br><br>一條沒有形體的巨龍纏繞著你，祂沒有顏色，沒有聲音，卻讓你感到無比沉重。", choices: [
+                { text: "恐懼地掙扎，企圖擺脫", action: () => { state.att += 3; return 'next_random'; } },
+                { text: "「凡所有相，皆是虛妄。」包含無相", action: () => { state.enl += 5; return 'next_random'; } },
+                { text: "以慈悲心擁抱虛空", action: () => { state.mer += 4; return 'next_random'; } }
+            ]},
+            'burn_body': { title: "燃身供", text: "<span class='glow-gold text-lg'>【燃身供養】</span><br><br>一位修行者點燃了自己的身體作為供養，火光照亮了無明。", choices: [
+                { text: "執著於苦行，效仿其自焚", action: () => { state.att += 4; return 'next_random'; } },
+                { text: "「若菩薩通達無我法者，如來說名真是菩薩。」", action: () => { state.enl += 4; return 'next_random'; } },
+                { text: "灑下甘露，熄滅其痛苦", action: () => { state.mer += 4; return 'next_random'; } }
+            ]},
+            'twin_trees': { title: "沙羅樹", text: "<span class='glow-white text-lg'>【雙樹枯榮】</span><br><br>你來到兩棵枯榮各異的沙羅樹下，一棵繁盛，一棵枯萎，象徵著生與滅的盡頭。", choices: [
+                { text: "依戀繁盛，厭惡枯萎", action: () => { state.att += 3; return 'next_random'; } },
+                { text: "超越枯榮，契入不生不滅之中道", action: () => { state.enl += 5; return 'next_random'; } },
+                { text: "【隱藏】「如來不應以具足色身見。」", cond: (s)=>s.enl>=15, action: () => { state.enl += 4; state.hiddenScore += 1; return 'next_random'; } }
             ]}
         };
 
