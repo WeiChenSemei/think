@@ -74,6 +74,7 @@
             -webkit-backdrop-filter: blur(0px);
             border-color: transparent;
             box-shadow: none;
+            transition-duration: 0.5s; /* 讓介面更快透明，把視覺焦點還給星空 */
         }
 
         /* Glowing Text */
@@ -185,8 +186,28 @@
             if (!title) return;
             // Generate normalized coordinates (0.1 to 0.9 to keep away from edges)
             const margin = 0.15;
-            const x = margin + Math.random() * (1 - margin * 2);
-            const y = margin + Math.random() * (1 - margin * 2);
+            let x, y;
+            let isValid = false;
+            let attempts = 0;
+            
+            // 避免星星重疊的防撞機制（最多嘗試 50 次尋找空曠處）
+            while (!isValid && attempts < 50) {
+                x = margin + Math.random() * (1 - margin * 2);
+                y = margin + Math.random() * (1 - margin * 2);
+                isValid = true;
+                
+                for (let star of constellation) {
+                    const dx = star.x - x;
+                    const dy = star.y - y;
+                    const dist = Math.sqrt(dx*dx + dy*dy);
+                    if (dist < 0.15) { // 如果兩顆星距離太近，則重新擲骰
+                        isValid = false;
+                        break;
+                    }
+                }
+                attempts++;
+            }
+
             const isFirst = constellation.length === 0;
             
             const newStar = { x, y, title, revealProgress: 0 };
@@ -408,6 +429,11 @@
                 { text: "拼命抓住『現在』的自己", action: () => { state.att += 3; return 'next_random'; } },
                 { text: "「過去現在未來皆不可得。」心不動", action: () => { state.enl += 4; return 'next_random'; } },
                 { text: "拉起其他溺水的旅人", action: () => { state.mer += 3; return 'next_random'; } }
+            ]},
+            'four_fruits': { title: "四聖果", text: "<span class='glow-white text-lg'>【四果聖殿】</span><br><br>四尊散發柔光的聖者雕像鎮守此地。祂們宣稱已證得須陀洹至阿羅漢之果位，邀請你安住於此，享受無漏之樂。", choices: [
+                { text: "虔誠頂禮，祈求賜予果位", action: () => { state.att += 3; state.mer += 2; return 'next_random'; } },
+                { text: "「若阿羅漢作是念：『我得阿羅漢道』，即為著我人眾生壽者。」", action: () => { state.enl += 5; return 'next_random'; } },
+                { text: "婉拒停留，繼續無盡的旅途", action: () => { state.enl += 2; return 'next_random'; } }
             ]},
             'dust_giant': { title: "微塵界", text: "<span class='glow-purple text-lg'>【微塵與世界】</span><br><br>宇宙巨人捏碎星球成微塵：「是微塵多，還是世界大？」", choices: [
                 { text: "「世界大！」敬畏其力量", action: () => { state.att += 2; return 'next_random'; } },
