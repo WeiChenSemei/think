@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>金剛經：星辰幻境</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600;700&display=swap');
+
+        :root {
+            --cyan-glow: rgba(34, 211, 238, 0.7);
+            --gold-glow: rgba(252, 211, 77, 0.7);
+            --purple-glow: rgba(192, 132, 252, 0.7);
+            --red-glow: rgba(248, 113, 113, 0.7);
+            --bg-color: #030305;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            font-family: 'Noto Serif TC', serif;
+            background-color: var(--bg-color);
+            color: #e5e7eb;
+            overflow: hidden; /* Prevent scrolling on body, handle inside main */
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* Canvas Background */
+        #starmap {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background: radial-gradient(ellipse at center, #0a0d18 0%, #020203 100%);
+        }
+
+        /* Glassmorphism Main Card */
+        .glass-container {
+            position: relative;
+            z-index: 10;
+            width: 95%;
+            max-width: 700px;
+            height: 90vh;
+            margin: 5vh auto;
+            display: flex;
+            flex-direction: column;
+            background: rgba(10, 12, 20, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            transition: all 1.5s ease-in-out;
+        }
+
+        .glass-container.ending-mode {
+            background: rgba(5, 7, 12, 0.15);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+            border-color: rgba(255, 255, 255, 0.05);
+            box-shadow: none;
+        }
+
+        /* 新增轉場模式，讓星辰圖在選擇後更加清晰 */
+        .glass-container.transition-mode {
+            background: rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(0px);
+            -webkit-backdrop-filter: blur(0px);
+            border-color: transparent;
+            box-shadow: none;
+        }
+
+        /* Glowing Text */
+        .glow-cyan { color: #22d3ee; text-shadow: 0 0 12px var(--cyan-glow); font-weight: 600; }
+        .glow-gold { color: #fcd34d; text-shadow: 0 0 12px var(--gold-glow); font-weight: 600; }
+        .glow-purple { color: #c084fc; text-shadow: 0 0 12px var(--purple-glow); font-weight: 600; }
+        .glow-red { color: #f87171; text-shadow: 0 0 12px var(--red-glow); font-weight: 600; }
+        .glow-white { color: #ffffff; text-shadow: 0 0 12px rgba(255,255,255,0.8); font-weight: 700; }
+        .hidden-tag { color: #8b5cf6; font-size: 0.85em; vertical-align: super; text-shadow: 0 0 5px rgba(139, 92, 246, 0.5); }
+
+        /* Buttons */
+        .glass-btn {
+            background: rgba(30, 35, 50, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        .glass-btn:hover, .glass-btn:active {
+            background: rgba(34, 211, 238, 0.1);
+            border-color: rgba(34, 211, 238, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4), 0 0 10px rgba(34, 211, 238, 0.2) inset;
+        }
+
+        /* Animations */
+        .fade-in { animation: fadeIn 0.8s ease-out forwards; opacity: 0; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Scrollbar hiding */
+        #scroll-area::-webkit-scrollbar { display: none; }
+        #scroll-area { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Overlays for Star Map interactions */
+        .fullscreen-overlay {
+            position: fixed; inset: 0; z-index: 50; display: none;
+            justify-content: center; align-items: flex-end; padding-bottom: 12vh;
+            color: rgba(255, 255, 255, 0.7); font-size: 1.1rem; letter-spacing: 0.1em;
+            cursor: pointer; text-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
+            animation: pulseText 2s infinite ease-in-out;
+        }
+        @keyframes pulseText { 0%, 100% { opacity: 0.4; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-5px); } }
+    </style>
+</head>
+<body>
+
+    <!-- Star Map Canvas -->
+    <canvas id="starmap"></canvas>
+
+    <!-- Click Overlays -->
+    <div id="continue-overlay" class="fullscreen-overlay">點擊畫面繼續...</div>
+    <div id="return-overlay" class="fullscreen-overlay" style="z-index: 100;">點擊畫面返回...</div>
+
+    <!-- Main UI Card -->
+    <div id="main-card" class="glass-container flex flex-col">
+        <!-- Header -->
+        <header class="w-full px-6 py-4 flex justify-between items-center shrink-0 border-b border-white/10">
+            <div class="text-[12px] sm:text-sm tracking-widest flex gap-4 md:gap-8 opacity-90">
+                <span class="text-cyan-400">覺悟 <span id="stat-enl" class="font-bold">0</span></span>
+                <span class="text-yellow-400">福德 <span id="stat-mer" class="font-bold">0</span></span>
+                <span class="text-red-400">執著 <span id="stat-att" class="font-bold">0</span></span>
+            </div>
+            <div class="text-[11px] sm:text-xs tracking-widest text-gray-300 opacity-80 bg-white/10 px-3 py-1 rounded-full border border-white/20" id="stat-loop">
+                輪迴 0
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <main id="scroll-area" class="flex-1 overflow-y-auto p-6 md:p-10 flex flex-col justify-between">
+            <div id="story-container" class="flex-1 flex flex-col justify-center space-y-6"></div>
+            <div id="choices-container" class="w-full flex flex-col space-y-3 mt-8 shrink-0 pb-4"></div>
+        </main>
+    </div>
+
+    <script>
+        // ==========================================
+        // STAR MAP CANVAS SYSTEM
+        // ==========================================
+        const canvas = document.getElementById('starmap');
+        const ctx = canvas.getContext('2d');
+        let constellation = []; // stores {x, y, title}
+        
+        let bgStars = [];
+        function initBgStars() {
+            for(let i=0; i<100; i++){
+                bgStars.push({
+                    x: Math.random(),
+                    y: Math.random(),
+                    size: Math.random() * 1.5,
+                    alpha: Math.random() * 0.5 + 0.1
+                });
+            }
+        }
+        initBgStars();
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            drawConstellation();
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function addStar(title) {
+            if (!title) return;
+            // Generate normalized coordinates (0.1 to 0.9 to keep away from edges)
+            const margin = 0.15;
+            const x = margin + Math.random() * (1 - margin * 2);
+            const y = margin + Math.random() * (1 - margin * 2);
+            const isFirst = constellation.length === 0;
+            
+            const newStar = { x, y, title, revealProgress: 0 };
+            constellation.push(newStar);
+            
+            // Animate drawing the new line and star
+            animateConstellation();
+        }
+
+        function clearStars() {
+            constellation = [];
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        let animFrame;
+        function animateConstellation() {
+            cancelAnimationFrame(animFrame);
+            
+            let progress = 0;
+            const speed = 0.015; // 放慢畫線速度，讓星辰連接的過程更明顯
+            
+            function step() {
+                progress += speed;
+                if (progress > 1) progress = 1;
+                
+                if (constellation.length > 0) {
+                    constellation[constellation.length - 1].revealProgress = progress;
+                }
+                
+                drawConstellation();
+                
+                if (progress < 1) {
+                    animFrame = requestAnimationFrame(step);
+                }
+            }
+            step();
+        }
+
+        function drawConstellation() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw background decorative static stars
+            drawBackgroundStars();
+
+            if (constellation.length === 0) return;
+
+            const w = canvas.width;
+            const h = canvas.height;
+
+            // Draw Lines
+            ctx.lineWidth = 1.5;
+            ctx.strokeStyle = 'rgba(100, 200, 255, 0.4)';
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = 'rgba(34, 211, 238, 0.8)';
+            ctx.beginPath();
+            
+            for (let i = 0; i < constellation.length; i++) {
+                const p = constellation[i];
+                const px = p.x * w;
+                const py = p.y * h;
+                
+                if (i === 0) {
+                    ctx.moveTo(px, py);
+                } else {
+                    const prev = constellation[i-1];
+                    const prevX = prev.x * w;
+                    const prevY = prev.y * h;
+                    
+                    if (i === constellation.length - 1) {
+                        // Animate the last line
+                        const currentX = prevX + (px - prevX) * p.revealProgress;
+                        const currentY = prevY + (py - prevY) * p.revealProgress;
+                        ctx.lineTo(currentX, currentY);
+                    } else {
+                        ctx.lineTo(px, py);
+                    }
+                }
+            }
+            ctx.stroke();
+
+            // Draw Stars and Titles
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            for (let i = 0; i < constellation.length; i++) {
+                const p = constellation[i];
+                const px = p.x * w;
+                const py = p.y * h;
+                const alpha = (i === constellation.length - 1) ? p.revealProgress : 1;
+
+                // Draw Dot
+                ctx.beginPath();
+                ctx.arc(px, py, 4, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+                ctx.fill();
+
+                // Draw Glow
+                ctx.beginPath();
+                ctx.arc(px, py, 12, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(34, 211, 238, ${alpha * 0.3})`;
+                ctx.fill();
+
+                // Draw Text
+                ctx.font = '14px "Noto Serif TC", serif';
+                ctx.shadowBlur = 5;
+                ctx.shadowColor = 'black';
+                ctx.fillStyle = `rgba(200, 230, 255, ${alpha * 0.9})`;
+                ctx.fillText(p.title, px, py - 20);
+            }
+            ctx.shadowBlur = 0; // reset
+        }
+
+        function drawBackgroundStars() {
+            ctx.fillStyle = '#fff';
+            for(let s of bgStars) {
+                ctx.globalAlpha = s.alpha;
+                ctx.beginPath();
+                ctx.arc(s.x * canvas.width, s.y * canvas.height, s.size, 0, Math.PI*2);
+                ctx.fill();
+            }
+            ctx.globalAlpha = 1.0;
+        }
+
+        // ==========================================
+        // GAME ENGINE & DATA
+        // ==========================================
+        let state = {
+            enl: 0, mer: 0, att: 0, loop: 0,
+            encounterCount: 0,
+            hiddenScore: 0,
+            pool: []
+        };
+
+        const ENCOUNTERS_PER_RUN = 8;
+
+        const fixedNodes = {
+            'start': {
+                title: "起點",
+                text: (s) => s.loop === 0 
+                    ? "你在無盡的虛空中甦醒。四周沒有星辰，只有流動的意識微光。<br><br>一個非男非女、空靈至極的聲音在你心中響起：<span class='glow-cyan'>「旅人，你為何而來？」</span>"
+                    : `迷霧退散，熟悉的重量與宿命感再次壓上肩頭。你<span class='glow-purple'>第 ${s.loop} 次</span>回到了起點。<br><br>那聲音發出一聲輕嘆：<span class='glow-cyan'>「既知一切有為法皆如夢幻，為何又一次涉足這片苦海？」</span>`,
+                choices: [
+                    { text: "為了尋求宇宙終極的真理與解脫", action: () => { state.enl += 2; return 'next_random'; } },
+                    { text: "為了拯救所有在幻境中受苦的生靈", action: () => { state.mer += 2; return 'next_random'; } },
+                    { text: "為了掌控命運，獲得無上的權柄", action: () => { state.att += 2; return 'next_random'; } },
+                    { text: "【覺醒】我無所求，亦無所來", cond: (s) => s.loop >= 1, action: () => { state.enl += 3; state.hiddenScore += 1; return 'next_random'; } }
+                ]
+            },
+            'labyrinth_1': {
+                title: "我相",
+                text: () => "<span class='glow-white text-xl'>【諸相非相迷宮 - 第一層：我相】</span><br><br>你步入一座由無數鏡面構成的迷宮。鏡中映照出你無數個前世：帝王、乞丐、飛鳥、螻蟻。所有的『你』同時開口：<br>「承認我！我是你不可磨滅的靈魂與存在！」",
+                choices: [
+                    { text: "擁抱鏡中的自己，確認『我』的獨特與偉大", action: () => { state.att += 4; return 'labyrinth_2'; } },
+                    { text: "「無我相。」擊碎鏡面，明白『我』只是幻影", action: () => { state.enl += 4; return 'labyrinth_2'; } }
+                ]
+            },
+            'labyrinth_2': {
+                title: "眾生相",
+                text: () => "<span class='glow-white text-xl'>【諸相非相迷宮 - 第二層：眾生相】</span><br><br>迷宮深處，億萬生靈的哀嚎與歡呼匯聚成洪流，將你淹沒。你感受到所有人的愛恨情仇。",
+                choices: [
+                    { text: "被洪流吞噬，沉溺於眾生的恩怨", action: () => { state.att += 4; return 'labyrinth_3'; } },
+                    { text: "發下宏願，願承載痛苦，度化眾生", action: () => { state.mer += 4; return 'labyrinth_3'; } },
+                    { text: "「無眾生相。」悲憫而不執著", action: () => { state.enl += 4; state.hiddenScore += 1; return 'labyrinth_3'; } }
+                ]
+            },
+            'labyrinth_3': {
+                title: "壽者相",
+                text: () => "<span class='glow-white text-xl'>【諸相非相迷宮 - 終點：壽者相】</span><br><br>時間實體化為一尊發光的神明。祂手持沙漏：<br>「跪拜我，賜你永生；否定我，化為灰燼。」",
+                choices: [
+                    { text: "恐懼死亡，虔誠地跪拜", action: () => { state.att += 5; return 'ending_check'; } },
+                    { text: "「無壽者相。」平靜地接受灰飛煙滅", action: () => { state.enl += 5; return 'ending_check'; } },
+                    { text: "【金剛】奪下沙漏，粉碎時間概念！", cond: (s) => s.loop >= 2 && s.hiddenScore >= 1, action: () => { state.enl += 5; state.hiddenScore += 2; return 'ending_check'; } }
+                ]
+            },
+            'ending_check': {
+                route: (s) => {
+                    if (s.loop >= 2 && s.hiddenScore >= 4 && s.enl >= 20) return 'end_diamond_heart';
+                    if (s.att >= 20) return 'end_demon';
+                    if (s.enl >= 24 && s.mer <= 10) return 'end_void';
+                    if (s.enl >= 20 && s.mer >= 15 && s.att <= 12) return 'end_nirvana';
+                    if (s.mer >= 18 && s.att >= 12) return 'end_heaven';
+                    return 'end_samsara';
+                }
+            },
+            'end_samsara': {
+                title: "輪迴",
+                text: () => `<span class='glow-purple text-2xl font-bold'>【結局：無盡輪迴】</span><br><br>迷宮化為漩渦，你對自我的執著化為鎖鏈，將你再次拖入生死疲勞的苦海。<br><br>「一切有為法，如夢幻泡影。」`,
+                choices: [{ text: "再次墮入輪迴", action: () => { reincarnate(); return 'start'; } }]
+            },
+            'end_demon': {
+                title: "魔王",
+                text: () => `<span class='glow-red text-2xl font-bold'>【結局：執念魔王】</span><br><br>你拒絕放下任何東西，化身為掌控一切的欲界魔王。擁有了一切，卻永遠被空虛折磨。<br><br>「凡所有相，皆是虛妄。」`,
+                choices: [{ text: "在瘋狂中迎來世界毀滅，重新輪迴", action: () => { reincarnate(); return 'start'; } }]
+            },
+            'end_void': {
+                title: "斷滅",
+                text: () => `<span class='text-gray-500 text-2xl font-bold'>【結局：斷滅空相】</span><br><br>你斬斷了所有執著，卻連同慈悲一併斬斷。你落入了絕對虛無的深淵，永遠孤獨。<br><br>「發阿耨多羅三藐三菩提心者，於法不說斷滅相。」`,
+                choices: [{ text: "在死寂中甦醒", action: () => { reincarnate(); return 'start'; } }]
+            },
+            'end_heaven': {
+                title: "天界",
+                text: () => `<span class='glow-gold text-2xl font-bold'>【結局：人天福報】</span><br><br>你累積無量福德，飛昇天界成為神明。但幾億萬年後，你依然要墜落凡塵。<br><br>這終究只是一個無比華麗的長夢。`,
+                choices: [{ text: "待天福耗盡轉世", action: () => { reincarnate(); return 'start'; } }]
+            },
+            'end_nirvana': {
+                title: "涅槃",
+                text: () => `<span class='glow-white text-2xl font-bold'>【結局：無餘涅槃】</span><br><br>你超越了所有的執著，打破了生死的牢籠。幻象如沙般消散。<br><br>「無所從來，亦無所去，故名如來。」`,
+                choices: [{ text: "化作虛空 (重置旅程)", action: () => { reincarnate(); return 'start'; } }]
+            },
+            'end_diamond_heart': {
+                title: "金剛心",
+                text: () => `<span class='glow-cyan text-3xl font-bold'>【真結局：金剛本心】</span><br><br>無盡的輪迴在你腳下停止。你化身千萬億個幻影，進入無數宇宙，優雅地渡化所有的悲傷。<br><br>「應無所住，而生其心。」`,
+                choices: [{ text: "歸於寂靜", action: () => { state.loop=0; state.hiddenScore=0; reincarnate(); return 'start'; } }]
+            }
+        };
+
+        const encounters = {
+            'three_hearts': { title: "三心河", text: "<span class='glow-cyan text-lg'>【三心之河】</span><br><br>河面倒影出過去、現在、未來，企圖將你拉入水底。", choices: [
+                { text: "拼命抓住『現在』的自己", action: () => { state.att += 3; return 'next_random'; } },
+                { text: "「過去現在未來皆不可得。」心不動", action: () => { state.enl += 4; return 'next_random'; } },
+                { text: "拉起其他溺水的旅人", action: () => { state.mer += 3; return 'next_random'; } }
+            ]},
+            'dust_giant': { title: "微塵界", text: "<span class='glow-purple text-lg'>【微塵與世界】</span><br><br>宇宙巨人捏碎星球成微塵：「是微塵多，還是世界大？」", choices: [
+                { text: "「世界大！」敬畏其力量", action: () => { state.att += 2; return 'next_random'; } },
+                { text: "「微塵與世界皆是假名。」", action: () => { state.enl += 4; return 'next_random'; } },
+                { text: "【隱藏】「若世界實有，即是一合相。」", cond: (s) => s.enl >= 6, action: () => { state.enl += 4; state.hiddenScore += 1; return 'next_random'; } }
+            ]},
+            'starry_raft': { title: "星空筏", text: "<span class='glow-white text-lg'>【星空渡筏】</span><br><br>擺渡人要求你過河後，將沉重的木筏頂在頭上繼續前進。", choices: [
+                { text: "背負木筏前行", action: () => { state.att += 4; return 'next_random'; } },
+                { text: "「法尚應捨。」灑脫離去", action: () => { state.enl += 4; return 'next_random'; } },
+                { text: "將筏留下為下一批人擺渡", action: () => { state.mer += 3; return 'next_random'; } }
+            ]},
+            'four_forms': { title: "四相廊", text: "<span class='glow-cyan text-lg'>【四相迴廊】</span><br><br>牆壁浮現我相、人相、眾生相、壽者相化作枷鎖。", choices: [
+                { text: "強行擊碎枷鎖", action: () => { state.att += 3; return 'next_random'; } },
+                { text: "不取於相，如如不動", action: () => { state.enl += 4; return 'next_random'; } },
+                { text: "【隱藏】看透四相皆空穿牆而過", chance: 0.5, action: () => { state.enl += 3; state.hiddenScore += 1; return 'next_random'; } }
+            ]},
+            'almsgiver': { title: "無住施", text: "<span class='glow-gold text-lg'>【無住相布施】</span><br><br>乞丐說：「我不要金銀，我要你將『布施』這個概念給我。」", choices: [
+                { text: "強行塞給他寶石", action: () => { state.att += 2; state.mer += 1; return 'next_random'; } },
+                { text: "忘記自己在布施，擦肩而過", action: () => { state.enl += 4; state.mer += 3; return 'next_random'; } },
+                { text: "變出『概念』騙他", action: () => { state.att += 3; return 'next_random'; } }
+            ]},
+            'diamond_blade': { title: "金剛刃", text: "<span class='glow-white text-lg'>【金剛利刃】</span><br><br>無形之劍懸浮。劍柄燃燒業火，有貪念者握之必焚。", choices: [
+                { text: "強忍劇痛握劍", action: () => { state.att += 5; return 'next_random'; } },
+                { text: "默默退下", action: () => { state.mer += 2; state.enl += 1; return 'next_random'; } },
+                { text: "以『無我』之境握劍", action: () => { state.enl += 5; state.hiddenScore += 1; return 'next_random'; } }
+            ]},
+            'sand_river': { title: "恆河寶", text: "<span class='glow-gold text-lg'>【恆河沙寶】</span><br><br>星塵商人捧著浩瀚寶石：「點頭，財富便是你的。」", choices: [
+                { text: "接受財寶", action: () => { state.att += 4; return 'next_random'; } },
+                { text: "視珍寶如幻影", action: () => { state.enl += 3; return 'next_random'; } },
+                { text: "收下並散播給各界", action: () => { state.mer += 4; return 'next_random'; } }
+            ]},
+            'hermit': { title: "忍辱仙", text: "<span class='glow-red text-lg'>【暴君與仙人】</span><br><br>暴君降臨，將你的手腳一節節斬斷，帶來真實痛楚。", choices: [
+                { text: "拚死反擊", action: () => { state.att += 4; return 'next_random'; } },
+                { text: "忍辱不嗔，覺悟無『我』", action: () => { state.enl += 4; return 'next_random'; } },
+                { text: "憐憫暴君被業力反噬", action: () => { state.mer += 4; return 'next_random'; } }
+            ]},
+            'sumeru': { title: "須彌山", text: "<span class='glow-white text-lg'>【須彌山王】</span><br><br>如星辰般巨大的巨人：「我的身軀如須彌山，你不敬畏嗎？」", choices: [
+                { text: "驚恐叩首", action: () => { state.att += 3; return 'next_random'; } },
+                { text: "「身相巨大亦是虛妄。」", action: () => { state.enl += 3; return 'next_random'; } },
+                { text: "【隱藏】化微塵包容須彌山", chance: 0.4, action: () => { state.enl += 4; state.hiddenScore += 1; return 'next_random'; } }
+            ]},
+            'mirage': { title: "海市蜃", text: "<span class='glow-cyan text-lg'>【海市蜃樓】</span><br><br>你在沙漠中看見晶瑩剔透的綠洲，甘泉閃爍誘人光芒。", choices: [
+                { text: "狂喜痛飲", action: () => { state.att += 3; return 'next_random'; } },
+                { text: "明白這是幻影止步", action: () => { state.enl += 3; return 'next_random'; } },
+                { text: "給予絕望旅人希望", action: () => { state.mer += 3; return 'next_random'; } }
+            ]},
+            'void_flower': { title: "虛空花", text: "<span class='glow-purple text-lg'>【虛空幻花】</span><br><br>漆黑虛空中綻放一朵美麗得令人窒息的曼陀羅花。", choices: [
+                { text: "想要摘下據為己有", action: () => { state.att += 4; return 'next_random'; } },
+                { text: "虛空本無花，生滅皆幻", action: () => { state.enl += 3; return 'next_random'; } },
+                { text: "看著它凋零而不悲傷", action: () => { state.enl += 2; state.mer += 2; return 'next_random'; } }
+            ]},
+            'starving_beast': { title: "餓獸噬", text: "<span class='glow-red text-lg'>【餓獸噬身】</span><br><br>一頭奄奄一息的巨獸發出淒厲哀嚎，即將餓死。", choices: [
+                { text: "殺死巨獸以絕後患", action: () => { state.att += 4; return 'next_random'; } },
+                { text: "默默繞道而行", action: () => { state.enl += 2; return 'next_random'; } },
+                { text: "割肉餵食野獸", action: () => { state.mer += 5; return 'next_random'; } }
+            ]}
+        };
+
+        // --- Core Engine Logic ---
+        function updateUI() {
+            document.getElementById('stat-enl').innerText = state.enl;
+            document.getElementById('stat-mer').innerText = state.mer;
+            document.getElementById('stat-att').innerText = state.att;
+            document.getElementById('stat-loop').innerText = `輪迴 ${state.loop}`;
+        }
+
+        function reincarnate() {
+            state.loop += 1;
+            state.enl = 0; state.mer = 0; state.att = 0;
+            document.getElementById('main-card').classList.remove('ending-mode');
+            clearStars();
+            initRun();
+        }
+
+        function toggleStarMap() {
+            const mainCard = document.getElementById('main-card');
+            const overlay = document.getElementById('return-overlay');
+            
+            // Fade out the main UI
+            mainCard.style.opacity = '0';
+            mainCard.style.pointerEvents = 'none';
+            overlay.style.display = 'flex';
+            
+            // Restore UI on click
+            overlay.onclick = () => {
+                mainCard.style.opacity = '1';
+                mainCard.style.pointerEvents = 'auto';
+                overlay.style.display = 'none';
+                
+                // Reset inline styles after transition (match the CSS transition time)
+                setTimeout(() => {
+                    mainCard.style.opacity = '';
+                    mainCard.style.pointerEvents = '';
+                }, 1500);
+            };
+        }
+
+        function initRun() {
+            state.encounterCount = 0;
+            state.pool = Object.keys(encounters).sort(() => 0.5 - Math.random());
+        }
+
+        function getNextNode() {
+            if (state.encounterCount >= ENCOUNTERS_PER_RUN) return 'labyrinth_1';
+            state.encounterCount++;
+            return `enc_${state.pool.pop()}`;
+        }
+
+        function shuffleArray(array) {
+            let arrCopy = [...array];
+            for (let i = arrCopy.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arrCopy[i], arrCopy[j]] = [arrCopy[j], arrCopy[i]];
+            }
+            return arrCopy;
+        }
+
+        // 將 renderNode 改為非同步(async)函式，以支援等待動畫完成
+        async function renderNode(nodeId) {
+            if (!nodeId) return; // 防呆：處理不需要載入新節點的情況（如點擊星辰圖按鈕）
+
+            let node;
+            
+            if (nodeId === 'next_random') {
+                nodeId = getNextNode();
+            }
+
+            if (nodeId.startsWith('enc_')) {
+                const encKey = nodeId.replace('enc_', '');
+                node = encounters[encKey];
+            } else {
+                node = fixedNodes[nodeId];
+            }
+            
+            if (node.route) {
+                renderNode(node.route(state));
+                return;
+            }
+
+            const storyContainer = document.getElementById('story-container');
+            const choicesContainer = document.getElementById('choices-container');
+            const mainCard = document.getElementById('main-card');
+
+            // 1. 先清空目前的文字與按鈕
+            storyContainer.innerHTML = '';
+            choicesContainer.innerHTML = '';
+
+            // 2. 讓 UI 變透明，進入欣賞星辰的轉場模式
+            if (!nodeId.startsWith('end_')) {
+                mainCard.classList.add('transition-mode');
+            }
+
+            // 3. 畫上新的星星，並等待玩家點擊後再繼續
+            if (node.title) {
+                const isFirst = constellation.length === 0;
+                addStar(node.title);
+                
+                if (!isFirst) {
+                    await new Promise(resolve => {
+                        // 稍微延遲讓星星連線動畫開始後，才顯示「點擊繼續」提示
+                        setTimeout(() => {
+                            const overlay = document.getElementById('continue-overlay');
+                            overlay.style.display = 'flex';
+                            overlay.onclick = () => {
+                                overlay.style.display = 'none';
+                                resolve();
+                            };
+                        }, 600); 
+                    });
+                } else {
+                    // 第一次打開遊戲的第一顆星不阻擋，自動播放過渡
+                    await new Promise(resolve => setTimeout(resolve, 800));
+                }
+            }
+
+            // 4. 動畫結束，恢復 UI 毛玻璃背景
+            mainCard.classList.remove('transition-mode');
+
+            // 檢查是否為結局，若為結局則保持背景透明
+            if (nodeId.startsWith('end_')) {
+                mainCard.classList.add('ending-mode');
+            }
+
+            // Render Text
+            const textEl = document.createElement('div');
+            textEl.className = 'text-base md:text-lg leading-loose tracking-wide fade-in font-light text-gray-200';
+            textEl.innerHTML = typeof node.text === 'function' ? node.text(state) : node.text;
+            storyContainer.appendChild(textEl);
+
+            // Render Choices
+            if (node.choices) {
+                let availableChoices = node.choices.filter(c => {
+                    if (c.cond && !c.cond(state)) return false;
+                    if (c.chance && Math.random() > c.chance) return false;
+                    return true;
+                });
+
+                // 若為結局，動態加入「查看命運星辰圖」選項
+                if (nodeId.startsWith('end_')) {
+                    availableChoices.push({
+                        text: "【觀想】查看命運星辰圖",
+                        action: () => { toggleStarMap(); return null; }
+                    });
+                }
+
+                availableChoices = shuffleArray(availableChoices);
+                
+                // 如果有查看星辰圖的選項，確保它被排在最前面
+                if (nodeId.startsWith('end_')) {
+                    const mapBtnIndex = availableChoices.findIndex(c => c.text.includes("查看命運星辰圖"));
+                    if (mapBtnIndex > -1) {
+                        const mapBtn = availableChoices.splice(mapBtnIndex, 1)[0];
+                        availableChoices.unshift(mapBtn);
+                    }
+                }
+
+                availableChoices.forEach((choice, index) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'glass-btn w-full p-4 rounded-xl text-gray-300 tracking-wider text-sm md:text-base text-left flex justify-between items-center group fade-in';
+                    btn.style.animationDelay = `${0.1 + index * 0.1}s`;
+                    
+                    const isHidden = choice.text.includes('【隱藏】') || choice.text.includes('【覺醒】') || choice.text.includes('【金剛】');
+                    let displayText = choice.text;
+                    if (isHidden) displayText = displayText.replace(/【(.*?)】/, "<span class='hidden-tag'>【$1】</span> ");
+
+                    btn.innerHTML = `
+                        <span class="pr-4 leading-relaxed">${displayText}</span>
+                        <span class="text-cyan-400/30 text-xl font-bold group-hover:text-cyan-300 transition-colors">›</span>
+                    `;
+                    
+                    btn.onclick = () => {
+                        const nextNodeId = choice.action();
+                        updateUI();
+                        document.getElementById('scroll-area').scrollTo({ top: 0, behavior: 'smooth' });
+                        renderNode(nextNodeId);
+                    };
+
+                    choicesContainer.appendChild(btn);
+                });
+            }
+        }
+
+        // --- Init ---
+        window.onload = () => {
+            initRun();
+            updateUI();
+            renderNode('start');
+        };
+    </script>
+</body>
+</html>
