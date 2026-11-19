@@ -46,8 +46,10 @@
             z-index: 10;
             width: 95%;
             max-width: 700px;
-            height: 90vh;
+            height: 90vh; /* Fallback for older browsers */
+            height: 90dvh; /* Dynamic Viewport Height fixes Safari bottom bar issue */
             margin: 5vh auto;
+            margin: 5dvh auto;
             display: flex;
             flex-direction: column;
             background: rgba(10, 12, 20, 0.65);
@@ -147,9 +149,9 @@
         </header>
 
         <!-- Content Area -->
-        <main id="scroll-area" class="flex-1 overflow-y-auto p-6 md:p-10 flex flex-col justify-between">
+        <main id="scroll-area" class="flex-1 overflow-y-auto p-6 md:p-10 pb-12 flex flex-col justify-between">
             <div id="story-container" class="flex-1 flex flex-col justify-center space-y-6"></div>
-            <div id="choices-container" class="w-full flex flex-col space-y-3 mt-8 shrink-0 pb-4"></div>
+            <div id="choices-container" class="w-full flex flex-col space-y-3 mt-8 shrink-0 pb-12"></div>
         </main>
     </div>
 
