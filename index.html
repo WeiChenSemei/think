@@ -56,59 +56,127 @@
             background: radial-gradient(circle at center, transparent 45%, rgba(1, 2, 6, 0.72) 100%);
         }
 
-        /* Glassmorphism Sutra Pavilion Card */
+        /* Glassmorphism Sutra Pavilion Card (GPU Optimized Blur Radius) */
         .glass-container {
             position: relative;
             z-index: 10;
             width: min(94%, 680px);
-            height: calc(100vh - 2.5rem);
-            height: calc(100dvh - 1.5rem - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
-            max-height: 88dvh;
+            height: calc(100vh - 1.5rem);
+            height: calc(100dvh - 1.2rem - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+            max-height: 92dvh;
             display: flex;
             flex-direction: column;
-            background: linear-gradient(165deg, rgba(12, 16, 28, 0.74) 0%, rgba(6, 8, 16, 0.82) 100%);
-            backdrop-filter: blur(16px) saturate(135%);
-            -webkit-backdrop-filter: blur(16px) saturate(135%);
+            background: linear-gradient(165deg, rgba(11, 15, 27, 0.86) 0%, rgba(5, 7, 15, 0.91) 100%);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            transform: translateZ(0);
             border: 1px solid rgba(var(--theme-rgb), 0.22);
             border-radius: 1.5rem;
             box-shadow:
-                0 30px 60px -15px rgba(0, 0, 0, 0.85),
-                0 0 35px -10px rgba(var(--theme-rgb), 0.18),
+                0 24px 48px -15px rgba(0, 0, 0, 0.85),
+                0 0 28px -10px rgba(var(--theme-rgb), 0.16),
                 inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
             transition:
-                background 1.1s cubic-bezier(0.22, 1, 0.36, 1),
-                backdrop-filter 1.1s cubic-bezier(0.22, 1, 0.36, 1),
-                border-color 0.9s ease,
-                box-shadow 0.9s ease,
-                opacity 0.9s ease,
-                transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+                background 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+                border-color 0.8s ease,
+                box-shadow 0.8s ease,
+                opacity 0.6s ease,
+                transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
             overflow: hidden;
         }
 
         .glass-container.ending-mode {
-            background: linear-gradient(165deg, rgba(6, 9, 18, 0.32) 0%, rgba(3, 5, 10, 0.42) 100%);
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
+            background: linear-gradient(165deg, rgba(6, 9, 18, 0.44) 0%, rgba(3, 5, 10, 0.56) 100%);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
             border-color: rgba(var(--theme-rgb), 0.28);
-            box-shadow: 0 0 50px -12px rgba(var(--theme-rgb), 0.22);
+            box-shadow: 0 0 40px -12px rgba(var(--theme-rgb), 0.2);
         }
 
-        /* 轉場觀星模式：隱去文字閣樓，將天地還給星辰 */
+        /* 轉場觀星模式：關閉毛玻璃採樣以釋放手機 GPU 算力 */
         .glass-container.transition-mode {
-            background: rgba(0, 0, 0, 0);
-            backdrop-filter: blur(0px);
-            -webkit-backdrop-filter: blur(0px);
+            opacity: 0;
+            background: transparent;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
             border-color: transparent;
             box-shadow: none;
             pointer-events: none;
-            transition-duration: 0.45s;
+            transition-duration: 0.38s;
         }
         .glass-container.transition-mode .card-ornament,
         .glass-container.transition-mode header,
         .glass-container.transition-mode .mala-bar,
         .glass-container.transition-mode .dharma-watermark {
             opacity: 0;
-            transition: opacity 0.35s ease;
+            transition: opacity 0.3s ease;
+        }
+
+        /* Chapter Title Wrapper - Compact & Single-Line Safe */
+        .realm-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            margin-bottom: 0.65rem;
+            position: relative;
+            width: 100%;
+        }
+        .realm-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 88%;
+            margin-top: 0.48rem;
+            gap: 0.6rem;
+            line-height: 1;
+        }
+        .realm-divider::before,
+        .realm-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.14));
+        }
+        .realm-divider::after {
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.14), transparent);
+        }
+        .realm-divider span {
+            font-size: 9px;
+            line-height: 1;
+            color: rgba(var(--theme-rgb), 0.72);
+            text-shadow: 0 0 8px rgba(var(--theme-rgb), 0.75);
+        }
+        .realm-title {
+            white-space: nowrap;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: clamp(1.02rem, 4.3vw, 1.28rem);
+            letter-spacing: 0.12em;
+            line-height: 1.35;
+        }
+        .realm-title.ending-title {
+            font-size: clamp(1.15rem, 4.9vw, 1.55rem);
+            letter-spacing: 0.14em;
+        }
+
+        /* Fullscreen Star-Gazing Overlays with Smooth Fade In/Out */
+        .fullscreen-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.52s cubic-bezier(0.22, 1, 0.36, 1);
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: calc(1.8rem + env(safe-area-inset-top, 0px)) 1.25rem calc(2rem + env(safe-area-inset-bottom, 0px));
+            cursor: pointer;
+        }
+        .fullscreen-overlay.visible {
+            opacity: 1;
         }
 
         /* Corner Filigree Ornaments */
@@ -127,7 +195,7 @@
         .ornament-bl { bottom: 10px; left: 10px; transform: scaleY(-1); }
         .ornament-br { bottom: 10px; right: 10px; transform: scale(-1, -1); }
 
-        /* Rotating Subtle Dharma Wheel Watermark inside Card */
+        /* Dharma Wheel Watermark (移除背景無限旋轉，改為隨關卡推進輕轉，避免毛玻璃層每幀重繪) */
         .dharma-watermark {
             position: absolute;
             top: 50%;
@@ -139,21 +207,16 @@
             pointer-events: none;
             opacity: 0.035;
             color: rgb(var(--theme-rgb));
-            animation: slowSpin 90s linear infinite;
-            transition: opacity 0.6s ease, color 1s ease;
+            transition: opacity 0.6s ease, color 1s ease, transform 2.2s cubic-bezier(0.22, 1, 0.36, 1);
             z-index: 0;
-        }
-        @keyframes slowSpin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
         }
 
         /* Glowing Typography */
-        .glow-cyan { color: #67e8f9; text-shadow: 0 0 14px var(--cyan-glow), 0 0 28px rgba(34,211,238,0.28); font-weight: 600; }
-        .glow-gold { color: #fde68a; text-shadow: 0 0 14px var(--gold-glow), 0 0 28px rgba(252,211,77,0.28); font-weight: 600; }
-        .glow-purple { color: #d8b4fe; text-shadow: 0 0 14px var(--purple-glow), 0 0 28px rgba(192,132,252,0.28); font-weight: 600; }
-        .glow-red { color: #fca5a5; text-shadow: 0 0 14px var(--red-glow), 0 0 28px rgba(248,113,113,0.28); font-weight: 600; }
-        .glow-white { color: #ffffff; text-shadow: 0 0 16px rgba(255,255,255,0.85), 0 0 32px rgba(165,243,252,0.35); font-weight: 700; }
+        .glow-cyan { color: #67e8f9; text-shadow: 0 0 12px var(--cyan-glow); font-weight: 600; }
+        .glow-gold { color: #fde68a; text-shadow: 0 0 12px var(--gold-glow); font-weight: 600; }
+        .glow-purple { color: #d8b4fe; text-shadow: 0 0 12px var(--purple-glow); font-weight: 600; }
+        .glow-red { color: #fca5a5; text-shadow: 0 0 12px var(--red-glow); font-weight: 600; }
+        .glow-white { color: #ffffff; text-shadow: 0 0 14px rgba(255,255,255,0.8); font-weight: 700; }
 
         .hidden-tag {
             display: inline-block;
@@ -169,68 +232,29 @@
             vertical-align: middle;
         }
 
-        /* Chapter Title Wrapper */
-        .realm-header {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            margin-bottom: 1.25rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-            position: relative;
-        }
-        .realm-header::after {
-            content: '❖';
-            position: absolute;
-            bottom: -9px;
-            font-size: 11px;
-            color: rgba(var(--theme-rgb), 0.7);
-            background: rgba(10, 14, 24, 0.9);
-            padding: 0 8px;
-            text-shadow: 0 0 8px rgba(var(--theme-rgb), 0.8);
-        }
-
         /* Obsidian Jade Choice Slips */
         .glass-btn {
-            background: linear-gradient(135deg, rgba(24, 30, 48, 0.55) 0%, rgba(14, 18, 30, 0.68) 100%);
+            background: linear-gradient(135deg, rgba(24, 30, 48, 0.58) 0%, rgba(14, 18, 30, 0.72) 100%);
             border: 1px solid rgba(255, 255, 255, 0.09);
-            transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+            transition: transform 0.28s ease, border-color 0.28s ease, background 0.28s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.06);
             position: relative;
             overflow: hidden;
         }
-        .glass-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 60%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(var(--theme-rgb), 0.12), transparent);
-            transform: skewX(-25deg);
-            transition: left 0.65s ease;
-            pointer-events: none;
-        }
-        .glass-btn:hover::before, .glass-btn:active::before {
-            left: 140%;
-        }
         .glass-btn:hover, .glass-btn:active {
-            background: linear-gradient(135deg, rgba(var(--theme-rgb), 0.15) 0%, rgba(20, 27, 45, 0.78) 100%);
+            background: linear-gradient(135deg, rgba(var(--theme-rgb), 0.15) 0%, rgba(20, 27, 45, 0.8) 100%);
             border-color: rgba(var(--theme-rgb), 0.48);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 22px rgba(0, 0, 0, 0.45), 0 0 16px rgba(var(--theme-rgb), 0.18) inset;
+            transform: translateY(-1.5px);
         }
 
         /* Special Awakened / Vajra Choice Button */
         .glass-btn.special-choice {
             background: linear-gradient(135deg, rgba(88, 28, 135, 0.28) 0%, rgba(120, 83, 18, 0.24) 100%);
             border-color: rgba(252, 211, 77, 0.38);
-            box-shadow: 0 4px 18px rgba(168, 85, 247, 0.18), inset 0 0 12px rgba(252, 211, 77, 0.08);
+            box-shadow: 0 4px 14px rgba(168, 85, 247, 0.16);
         }
         .glass-btn.special-choice:hover, .glass-btn.special-choice:active {
             border-color: rgba(252, 211, 77, 0.75);
-            box-shadow: 0 8px 25px rgba(168, 85, 247, 0.32), 0 0 18px rgba(252, 211, 77, 0.22) inset;
         }
 
         /* Mala Progress Beads */
@@ -269,22 +293,22 @@
             box-shadow: 0 0 12px #fef08a, 0 0 18px rgba(252, 211, 77, 0.9);
         }
 
-        /* Mist & Ink Reveal Animations */
+        /* Pure Compositor Animations (移除耗電的動態 CSS filter: blur 逐幀運算) */
         .mist-reveal {
-            animation: mistReveal 0.95s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            animation: mistReveal 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards;
             opacity: 0;
         }
         @keyframes mistReveal {
-            0% { opacity: 0; filter: blur(8px); transform: translateY(12px) scale(0.99); }
-            100% { opacity: 1; filter: blur(0px); transform: translateY(0) scale(1); }
+            0% { opacity: 0; transform: translateY(10px) scale(0.99); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         .fade-in {
-            animation: fadeIn 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            animation: fadeIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
             opacity: 0;
         }
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(12px); }
+            from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
@@ -308,32 +332,19 @@
         #scroll-area::-webkit-scrollbar { display: none; }
         #scroll-area { -ms-overflow-style: none; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
 
-        /* Fullscreen Star-Gazing Overlays */
-        .fullscreen-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 50;
-            display: none;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            padding: calc(2.2rem + env(safe-area-inset-top, 0px)) 1.5rem calc(2.5rem + env(safe-area-inset-bottom, 0px));
-            cursor: pointer;
-        }
-
         .gatha-whisper {
             max-width: 90%;
             text-align: center;
             font-size: 0.9rem;
             letter-spacing: 0.22em;
             line-height: 1.9;
-            color: rgba(226, 232, 240, 0.85);
-            text-shadow: 0 0 14px rgba(34, 211, 238, 0.55), 0 2px 6px rgba(0, 0, 0, 0.95);
-            animation: gathaFade 1.2s ease-out forwards;
+            color: rgba(226, 232, 240, 0.88);
+            text-shadow: 0 0 12px rgba(34, 211, 238, 0.5), 0 2px 6px rgba(0, 0, 0, 0.95);
+            animation: gathaFade 0.9s ease-out forwards;
         }
         @keyframes gathaFade {
-            from { opacity: 0; filter: blur(6px); transform: translateY(-8px); }
-            to { opacity: 1; filter: blur(0); transform: translateY(0); }
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .zen-prompt-pill {
@@ -342,19 +353,18 @@
             gap: 0.65rem;
             padding: 0.55rem 1.35rem;
             border-radius: 9999px;
-            background: rgba(8, 12, 24, 0.55);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+            background: rgba(8, 12, 24, 0.84);
             border: 1px solid rgba(var(--theme-rgb), 0.35);
-            color: rgba(241, 245, 249, 0.9);
+            color: rgba(241, 245, 249, 0.92);
             font-size: 0.88rem;
             letter-spacing: 0.2em;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.6), 0 0 15px rgba(var(--theme-rgb), 0.18);
-            animation: pulseText 2.6s infinite ease-in-out;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.65);
+            will-change: opacity, transform;
+            animation: pulseText 2.8s infinite ease-in-out;
         }
         @keyframes pulseText {
             0%, 100% { opacity: 0.55; transform: translateY(0); }
-            50% { opacity: 1; transform: translateY(-4px); }
+            50% { opacity: 1; transform: translateY(-3px); }
         }
     </style>
 </head>
@@ -426,8 +436,8 @@
         </svg>
 
         <!-- Header HUD -->
-        <header class="relative z-10 w-full px-5 sm:px-7 pt-4 pb-3 flex justify-between items-center shrink-0 border-b border-white/10">
-            <div class="text-xs sm:text-sm tracking-wider flex items-center gap-3.5 sm:gap-6">
+        <header class="relative z-10 w-full px-4 sm:px-6 pt-2.5 pb-2 flex justify-between items-center shrink-0 border-b border-white/10">
+            <div class="text-xs sm:text-sm tracking-wider flex items-center gap-3 sm:gap-5">
                 <!-- 覺悟 -->
                 <div id="wrap-enl" class="relative flex items-center gap-1.5 text-cyan-300">
                     <svg class="w-3.5 h-3.5 opacity-85" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -477,7 +487,7 @@
         </header>
 
         <!-- 12-Bead Mala Progress Bar (8 Illusions + 4 Labyrinth Marks) -->
-        <div class="mala-bar relative z-10 w-full px-6 py-2 flex items-center justify-center gap-2 border-b border-white/5 bg-black/15 shrink-0">
+        <div class="mala-bar relative z-10 w-full px-4 py-1.5 flex items-center justify-center gap-2 border-b border-white/5 bg-black/15 shrink-0">
             <span class="text-[10px] tracking-[0.2em] text-slate-400/75 mr-1">幻境</span>
             <div id="mala-encounters" class="flex items-center gap-1.5"></div>
             <span class="text-white/20 text-[10px] mx-1">｜</span>
@@ -485,10 +495,10 @@
             <div id="mala-labyrinth" class="flex items-center gap-2"></div>
         </div>
 
-        <!-- Scrollable Content Area -->
-        <main id="scroll-area" class="relative z-10 flex-1 overflow-y-auto px-6 py-6 sm:px-10 sm:py-8 pb-12 flex flex-col justify-between">
-            <div id="story-container" class="flex-1 flex flex-col justify-center space-y-5"></div>
-            <div id="choices-container" class="w-full flex flex-col space-y-3 mt-7 shrink-0 pb-10"></div>
+        <!-- Compact Single-Screen Content Area -->
+        <main id="scroll-area" class="relative z-10 flex-1 overflow-y-auto px-5 py-3.5 sm:px-8 sm:py-5 flex flex-col justify-between">
+            <div id="story-container" class="flex-1 flex flex-col justify-center space-y-3"></div>
+            <div id="choices-container" class="w-full flex flex-col space-y-2 mt-3.5 shrink-0 pb-1"></div>
         </main>
     </div>
 
@@ -637,116 +647,205 @@
         }
 
         // ==========================================
-        // LIVING MANDALA & STAR MAP CANVAS SYSTEM (60fps Retina)
+        // ENERGY-EFFICIENT MANDALA & STAR MAP SYSTEM
         // ==========================================
         const canvas = document.getElementById('starmap');
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext('2d', { alpha: true });
         let viewW = window.innerWidth;
         let viewH = window.innerHeight;
-        let constellation = []; // { x, y, title, color, revealProgress, burstDone, isMajor }
+        let constellation = [];
         let pendingStarColor = { r: 34, g: 211, b: 238 };
 
         let bgStars = [];
+        const starBuckets = [[], [], [], []];
+        const STAR_ALPHA_TIERS = [0.18, 0.34, 0.52, 0.72];
         let realmParticles = [];
         let touchRipples = [];
         let starBursts = [];
         let shootingStar = null;
         let parallax = { x: 0, y: 0, tx: 0, ty: 0 };
 
-        function initBgStars() {
-            bgStars = [];
-            for (let i = 0; i < 130; i++) {
-                bgStars.push({
-                    x: Math.random(),
-                    y: Math.random(),
-                    size: Math.random() * 1.4 + 0.3,
-                    baseAlpha: Math.random() * 0.55 + 0.12,
-                    twinkleSpeed: Math.random() * 0.0025 + 0.0008,
-                    phase: Math.random() * Math.PI * 2,
-                    depth: Math.random() * 0.8 + 0.2
-                });
+        // 離屏光暈與幾何快取（消除每幀重複建立 RadialGradient 與數十次 Path 運算）
+        const glowSpriteCache = new Map();
+        const nebulaSpriteCache = new Map();
+        let mandalaPaths = { outer: null, octagram: null, lotus: null };
+
+        // 智慧幀率與背景休眠控制
+        let isPageVisible = !document.hidden;
+        let lastFrameTime = 0;
+        let rafId = null;
+
+        function getGlowSprite(r, g, b) {
+            const qr = Math.round(r / 4) * 4;
+            const qg = Math.round(g / 4) * 4;
+            const qb = Math.round(b / 4) * 4;
+            const key = `${qr},${qg},${qb}`;
+            if (glowSpriteCache.has(key)) return glowSpriteCache.get(key);
+            if (glowSpriteCache.size > 24) glowSpriteCache.clear();
+
+            const size = 64;
+            const off = document.createElement('canvas');
+            off.width = size;
+            off.height = size;
+            const octx = off.getContext('2d');
+            const half = size / 2;
+            const grad = octx.createRadialGradient(half, half, 0, half, half, half);
+            grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+            grad.addColorStop(0.11, 'rgba(255, 255, 255, 0.92)');
+            grad.addColorStop(0.28, `rgba(${qr}, ${qg}, ${qb}, 0.65)`);
+            grad.addColorStop(0.62, `rgba(${qr}, ${qg}, ${qb}, 0.16)`);
+            grad.addColorStop(1, `rgba(${qr}, ${qg}, ${qb}, 0)`);
+            octx.fillStyle = grad;
+            octx.fillRect(0, 0, size, size);
+            glowSpriteCache.set(key, off);
+            return off;
+        }
+
+        function getNebulaSprite(r, g, b, secR, secG, secB) {
+            const qr = Math.round(r / 8) * 8;
+            const qg = Math.round(g / 8) * 8;
+            const qb = Math.round(b / 8) * 8;
+            const key = `${qr},${qg},${qb}`;
+            if (nebulaSpriteCache.has(key)) return nebulaSpriteCache.get(key);
+            if (nebulaSpriteCache.size > 12) nebulaSpriteCache.clear();
+
+            const size = 128;
+            const off = document.createElement('canvas');
+            off.width = size;
+            off.height = size;
+            const octx = off.getContext('2d');
+            const half = size / 2;
+            const g1 = octx.createRadialGradient(half, half, 0, half, half, half);
+            g1.addColorStop(0, `rgba(${qr}, ${qg}, ${qb}, 1)`);
+            g1.addColorStop(0.55, `rgba(${Math.round(secR)}, ${Math.round(secG)}, ${Math.round(secB)}, 0.38)`);
+            g1.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            octx.fillStyle = g1;
+            octx.fillRect(0, 0, size, size);
+            nebulaSpriteCache.set(key, off);
+            return off;
+        }
+
+        // 預先建構金剛界曼陀羅 Path2D 幾何，將每幀 48 次 stroke 降至 3 次
+        function buildMandalaPaths() {
+            const baseR = Math.min(viewW, viewH) * 0.36;
+
+            const outer = new Path2D();
+            outer.arc(0, 0, baseR * 1.08, 0, Math.PI * 2);
+            const r1 = baseR * 1.05;
+            const r2 = baseR * 1.11;
+            for (let i = 0; i < 32; i++) {
+                const ang = (i * Math.PI * 2) / 32;
+                outer.moveTo(Math.cos(ang) * r1, Math.sin(ang) * r1);
+                outer.lineTo(Math.cos(ang) * r2, Math.sin(ang) * r2);
             }
-            realmParticles = [];
-            for (let i = 0; i < 48; i++) {
-                realmParticles.push(createRealmParticle(true));
+            mandalaPaths.outer = outer;
+
+            const oct = new Path2D();
+            const sq = baseR * 0.72;
+            oct.rect(-sq, -sq, sq * 2, sq * 2);
+            const diag = sq * Math.SQRT2;
+            oct.moveTo(0, -diag);
+            oct.lineTo(diag, 0);
+            oct.lineTo(0, diag);
+            oct.lineTo(-diag, 0);
+            oct.closePath();
+            mandalaPaths.octagram = oct;
+
+            const lotus = new Path2D();
+            for (let i = 0; i < 12; i++) {
+                const a = (i * Math.PI * 2) / 12;
+                const cos = Math.cos(a);
+                const sin = Math.sin(a);
+                const sx = -sin * (baseR * 0.22), sy = cos * (baseR * 0.22);
+                const ex = -sin * (baseR * 0.86), ey = cos * (baseR * 0.86);
+                const c1x = cos * (baseR * 0.24) - sin * (baseR * 0.56);
+                const c1y = sin * (baseR * 0.24) + cos * (baseR * 0.56);
+                const c2x = -cos * (baseR * 0.24) - sin * (baseR * 0.56);
+                const c2y = -sin * (baseR * 0.24) + cos * (baseR * 0.56);
+                lotus.moveTo(sx, sy);
+                lotus.quadraticCurveTo(c1x, c1y, ex, ey);
+                lotus.quadraticCurveTo(c2x, c2y, sx, sy);
             }
+            lotus.moveTo(baseR * 0.22, 0);
+            lotus.arc(0, 0, baseR * 0.22, 0, Math.PI * 2);
+            mandalaPaths.lotus = lotus;
         }
 
         function createRealmParticle(randomY = false) {
             return {
                 x: Math.random(),
                 y: randomY ? Math.random() : 1.06,
-                vx: (Math.random() - 0.5) * 0.00035,
-                vy: -(Math.random() * 0.00055 + 0.0002),
-                size: Math.random() * 3.5 + 1.5,
+                vx: (Math.random() - 0.5) * 0.0002,
+                vy: -(Math.random() * 0.0003 + 0.00012),
+                size: Math.random() * 3.4 + 1.5,
                 alpha: Math.random() * 0.45 + 0.12,
                 rot: Math.random() * Math.PI * 2,
-                rotSpeed: (Math.random() - 0.5) * 0.02,
+                rotSpeed: (Math.random() - 0.5) * 0.005,
                 swayPhase: Math.random() * Math.PI * 2
             };
         }
 
-        initBgStars();
-
-        function resizeCanvas() {
-            const dpr = Math.min(window.devicePixelRatio || 1, 2);
-            viewW = window.innerWidth;
-            viewH = window.innerHeight;
-            canvas.width = Math.floor(viewW * dpr);
-            canvas.height = Math.floor(viewH * dpr);
-            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        // Pointer Parallax & Lotus Water Ripples on Tap/Click
-        window.addEventListener('pointermove', (e) => {
-            parallax.tx = (e.clientX / viewW - 0.5) * 22;
-            parallax.ty = (e.clientY / viewH - 0.5) * 22;
-        });
-
-        window.addEventListener('pointerdown', (e) => {
-            spawnLotusRipple(e.clientX, e.clientY, false);
-        });
-
-        function spawnLotusRipple(x, y, grand = false) {
-            touchRipples.push({
-                x, y,
-                r: 2,
-                maxR: grand ? 135 : 75,
-                alpha: grand ? 0.75 : 0.48,
-                color: { ...targetTheme }
-            });
-            if (grand) {
-                touchRipples.push({
-                    x, y,
-                    r: 12,
-                    maxR: 90,
-                    alpha: 0.55,
-                    color: { r: 252, g: 211, b: 77 }
+        function initBgStars() {
+            bgStars = [];
+            for (let i = 0; i < 72; i++) {
+                bgStars.push({
+                    x: Math.random(),
+                    y: Math.random(),
+                    size: Math.random() * 1.35 + 0.45,
+                    baseAlpha: Math.random() * 0.55 + 0.2,
+                    twinkleSpeed: Math.random() * 0.0009 + 0.0003,
+                    phase: Math.random() * Math.PI * 2,
+                    depth: Math.random() * 0.8 + 0.2
                 });
             }
+            realmParticles = [];
+            for (let i = 0; i < 16; i++) {
+                realmParticles.push(createRealmParticle(true));
+            }
+        }
+
+        // 計算星辰在極緩慢旋轉星盤與微幅漂浮軌道上的即時螢幕座標
+        function getStarScreenPos(star, time) {
+            const globalAngle = time * 0.000012;
+            const localOx = Math.cos(time * star.orbitSpeed + star.orbitPhase) * star.orbitRadius;
+            const localOy = Math.sin(time * star.orbitSpeed + star.orbitPhase) * star.orbitRadius;
+            const u = star.u + localOx;
+            const v = star.v + localOy;
+
+            const cosA = Math.cos(globalAngle);
+            const sinA = Math.sin(globalAngle);
+            const rotU = u * cosA - v * sinA;
+            const rotV = u * sinA + v * cosA;
+
+            const driftX = Math.sin(time * 0.000035) * (viewW * 0.008);
+            const driftY = Math.cos(time * 0.000028) * (viewH * 0.007);
+
+            const px = (0.5 + rotU) * viewW + driftX + parallax.x * 0.65;
+            const py = (0.51 + rotV) * viewH + driftY + parallax.y * 0.65;
+            return { px, py, normY: 0.51 + rotV };
         }
 
         function addStar(title, isMajor = false) {
             if (!title) return;
-            const marginX = 0.15;
-            const marginY = 0.16;
-            let x, y;
+            const maxR = 0.30;
+            let u = 0, v = 0;
             let isValid = false;
             let attempts = 0;
 
-            // 排斥防撞機制：確保每顆星辰與既有星辰保持優雅間距
-            while (!isValid && attempts < 65) {
-                x = marginX + Math.random() * (1 - marginX * 2);
-                y = marginY + Math.random() * (1 - marginY * 2);
+            while (!isValid && attempts < 80) {
+                const r = constellation.length === 0
+                    ? Math.random() * 0.08
+                    : 0.075 + Math.sqrt(Math.random()) * (maxR - 0.075);
+                const theta = Math.random() * Math.PI * 2;
+                u = Math.cos(theta) * r;
+                v = Math.sin(theta) * r;
                 isValid = true;
 
+                const minDist = attempts < 45 ? 0.125 : 0.09;
                 for (let star of constellation) {
-                    const dx = star.x - x;
-                    const dy = star.y - y;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist < 0.155) {
+                    const du = star.u - u;
+                    const dv = star.v - v;
+                    if (Math.sqrt(du * du + dv * dv) < minDist) {
                         isValid = false;
                         break;
                     }
@@ -756,9 +855,13 @@
 
             const isFirst = constellation.length === 0;
             const newStar = {
-                x,
-                y,
+                u,
+                v,
+                orbitRadius: 0.0025 + Math.random() * 0.0035,
+                orbitSpeed: (0.00006 + Math.random() * 0.00006) * (Math.random() > 0.5 ? 1 : -1),
+                orbitPhase: Math.random() * Math.PI * 2,
                 title,
+                labelWidth: 0,
                 color: isFirst ? { r: 226, g: 232, b: 240 } : { ...pendingStarColor },
                 revealProgress: isFirst ? 1 : 0,
                 burstDone: isFirst,
@@ -768,7 +871,71 @@
             constellation.push(newStar);
 
             if (isFirst) {
-                spawnLotusRipple(x * viewW, y * viewH, true);
+                const pos = getStarScreenPos(newStar, performance.now());
+                spawnLotusRipple(pos.px, pos.py, true);
+            }
+        }
+
+        function resizeCanvas() {
+            // 針對手機螢幕限制 DPR 為 1.5，兼顧銳利度並減少約 44% 像素填充耗電
+            const maxDpr = window.innerWidth < 768 ? 1.5 : 1.75;
+            const dpr = Math.min(window.devicePixelRatio || 1, maxDpr);
+            viewW = window.innerWidth;
+            viewH = window.innerHeight;
+            canvas.width = Math.floor(viewW * dpr);
+            canvas.height = Math.floor(viewH * dpr);
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            buildMandalaPaths();
+        }
+
+        initBgStars();
+        resizeCanvas();
+
+        window.addEventListener('resize', resizeCanvas, { passive: true });
+
+        window.addEventListener('pointermove', (e) => {
+            parallax.tx = (e.clientX / viewW - 0.5) * 20;
+            parallax.ty = (e.clientY / viewH - 0.5) * 20;
+        }, { passive: true });
+
+        window.addEventListener('pointerdown', (e) => {
+            spawnLotusRipple(e.clientX, e.clientY, false);
+        }, { passive: true });
+
+        // 切換分頁或鎖屏時徹底暫停渲染與音效引擎
+        document.addEventListener('visibilitychange', () => {
+            isPageVisible = !document.hidden;
+            if (isPageVisible) {
+                lastFrameTime = performance.now();
+                if (!rafId) rafId = requestAnimationFrame(masterAnimateLoop);
+            } else {
+                if (rafId) {
+                    cancelAnimationFrame(rafId);
+                    rafId = null;
+                }
+                if (ZenAudio.ctx && ZenAudio.ctx.state === 'running') {
+                    ZenAudio.ctx.suspend().catch(() => {});
+                }
+            }
+        });
+
+        function spawnLotusRipple(x, y, grand = false) {
+            if (touchRipples.length > 6) touchRipples.shift();
+            touchRipples.push({
+                x, y,
+                r: 2,
+                maxR: grand ? 130 : 72,
+                alpha: grand ? 0.72 : 0.45,
+                color: { ...targetTheme }
+            });
+            if (grand) {
+                touchRipples.push({
+                    x, y,
+                    r: 12,
+                    maxR: 88,
+                    alpha: 0.52,
+                    color: { r: 252, g: 211, b: 77 }
+                });
             }
         }
 
@@ -779,144 +946,129 @@
 
         function triggerStarArrivalBurst(px, py, color) {
             spawnLotusRipple(px, py, true);
-            for (let i = 0; i < 16; i++) {
-                const angle = (Math.PI * 2 * i) / 16 + Math.random() * 0.2;
-                const spd = Math.random() * 1.6 + 0.6;
+            for (let i = 0; i < 12; i++) {
+                const angle = (Math.PI * 2 * i) / 12 + Math.random() * 0.2;
+                const spd = Math.random() * 1.5 + 0.6;
                 starBursts.push({
                     x: px,
                     y: py,
                     vx: Math.cos(angle) * spd,
                     vy: Math.sin(angle) * spd,
-                    size: Math.random() * 2.2 + 1,
-                    alpha: 0.95,
+                    size: Math.random() * 2.0 + 1,
+                    alpha: 0.92,
                     color
                 });
             }
         }
 
         function drawStarFlare(x, y, radius, spikeLen, color, alpha) {
+            if (alpha <= 0.02) return;
+            const sprite = getGlowSprite(color.r, color.g, color.b);
+            const drawSize = radius * 7.6;
+
             ctx.save();
-            ctx.translate(x, y);
+            ctx.globalAlpha = Math.min(1, alpha);
+            ctx.drawImage(sprite, x - drawSize * 0.5, y - drawSize * 0.5, drawSize, drawSize);
 
-            // Radial Aura
-            const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, radius * 3.8);
-            grad.addColorStop(0, `rgba(255, 255, 255, ${alpha})`);
-            grad.addColorStop(0.28, `rgba(${color.r}, ${color.g}, ${color.b}, ${alpha * 0.65})`);
-            grad.addColorStop(1, `rgba(${color.r}, ${color.g}, ${color.b}, 0)`);
-            ctx.fillStyle = grad;
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.82)';
+            ctx.lineWidth = 1.05;
             ctx.beginPath();
-            ctx.arc(0, 0, radius * 3.8, 0, Math.PI * 2);
-            ctx.fill();
-
-            // 4-Pointed Vajra Star Spikes
-            ctx.strokeStyle = `rgba(255, 255, 255, ${alpha * 0.85})`;
-            ctx.lineWidth = 1.1;
-            ctx.beginPath();
-            ctx.moveTo(-spikeLen, 0);
-            ctx.lineTo(spikeLen, 0);
-            ctx.moveTo(0, -spikeLen);
-            ctx.lineTo(0, spikeLen);
+            ctx.moveTo(x - spikeLen, y);
+            ctx.lineTo(x + spikeLen, y);
+            ctx.moveTo(x, y - spikeLen);
+            ctx.lineTo(x, y + spikeLen);
             ctx.stroke();
-
-            // Core Pearl
-            ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
-            ctx.beginPath();
-            ctx.arc(0, 0, radius * 0.68, 0, Math.PI * 2);
-            ctx.fill();
-
             ctx.restore();
         }
 
         function drawSacredMandala(time) {
+            if (!mandalaPaths.outer) return;
             const cx = viewW * 0.5 + parallax.x * 0.35;
             const cy = viewH * 0.5 + parallax.y * 0.35;
-            const baseR = Math.min(viewW, viewH) * 0.36;
             const alpha = 0.055 + starViewBoost * 0.085;
             const c = currentTheme;
 
             ctx.save();
             ctx.translate(cx, cy);
 
-            // Outer 32-Division Ring (呼應金剛經三十二品)
-            ctx.strokeStyle = `rgba(${c.r}, ${c.g}, ${c.b}, ${alpha})`;
-            ctx.lineWidth = 0.8;
-            ctx.beginPath();
-            ctx.arc(0, 0, baseR * 1.08, 0, Math.PI * 2);
-            ctx.stroke();
-
-            for (let i = 0; i < 32; i++) {
-                const ang = (i * Math.PI * 2) / 32 + time * 0.00004;
-                const r1 = baseR * 1.05;
-                const r2 = baseR * 1.11;
-                ctx.beginPath();
-                ctx.moveTo(Math.cos(ang) * r1, Math.sin(ang) * r1);
-                ctx.lineTo(Math.cos(ang) * r2, Math.sin(ang) * r2);
-                ctx.stroke();
-            }
-
-            // Rotating Vajra Octagram (金剛界幾何)
+            // 1. 三十二刻度外環 (1 次快取繪製)
             ctx.save();
-            ctx.rotate(time * 0.00006);
+            ctx.rotate(time * 0.000007);
+            ctx.strokeStyle = `rgba(${c.r | 0}, ${c.g | 0}, ${c.b | 0}, ${alpha})`;
+            ctx.lineWidth = 0.8;
+            ctx.stroke(mandalaPaths.outer);
+            ctx.restore();
+
+            // 2. 金剛界八葉幾何 (1 次快取繪製)
+            ctx.save();
+            ctx.rotate(time * 0.00001);
             ctx.strokeStyle = `rgba(252, 211, 77, ${alpha * 0.85})`;
             ctx.lineWidth = 0.75;
-            const sq = baseR * 0.72;
-            ctx.strokeRect(-sq, -sq, sq * 2, sq * 2);
-            ctx.rotate(Math.PI / 4);
-            ctx.strokeRect(-sq, -sq, sq * 2, sq * 2);
+            ctx.stroke(mandalaPaths.octagram);
             ctx.restore();
 
-            // Counter-Rotating 12-Petal Lotus (十二葉般若蓮華)
+            // 3. 逆旋十二葉般若蓮華與圓心 (1 次快取繪製)
             ctx.save();
-            ctx.rotate(-time * 0.00008);
-            const breathe = 1 + Math.sin(time * 0.0012) * 0.03;
+            ctx.rotate(-time * 0.000014);
+            const breathe = 1 + Math.sin(time * 0.00035) * 0.02;
             ctx.scale(breathe, breathe);
-            ctx.strokeStyle = `rgba(${c.r}, ${c.g}, ${c.b}, ${alpha * 1.15})`;
+            ctx.strokeStyle = `rgba(${c.r | 0}, ${c.g | 0}, ${c.b | 0}, ${alpha * 1.15})`;
             ctx.lineWidth = 0.9;
-            for (let i = 0; i < 12; i++) {
-                ctx.rotate((Math.PI * 2) / 12);
-                ctx.beginPath();
-                ctx.moveTo(0, baseR * 0.22);
-                ctx.quadraticCurveTo(baseR * 0.24, baseR * 0.56, 0, baseR * 0.86);
-                ctx.quadraticCurveTo(-baseR * 0.24, baseR * 0.56, 0, baseR * 0.22);
-                ctx.stroke();
-            }
+            ctx.stroke(mandalaPaths.lotus);
             ctx.restore();
-
-            // Inner Seed Circle
-            ctx.strokeStyle = `rgba(255, 255, 255, ${alpha * 0.9})`;
-            ctx.beginPath();
-            ctx.arc(0, 0, baseR * 0.22, 0, Math.PI * 2);
-            ctx.stroke();
 
             ctx.restore();
         }
 
-        function drawNebulaAndStars(time) {
+        function drawNebulaAndStars(time, dtScale) {
             const c = currentTheme;
-            // Breathing Cosmic Nebula Aura
-            const n1x = viewW * (0.32 + Math.sin(time * 0.0002) * 0.08) - parallax.x * 0.4;
-            const n1y = viewH * (0.35 + Math.cos(time * 0.00018) * 0.06) - parallax.y * 0.4;
-            const rad1 = Math.max(viewW, viewH) * 0.55;
-            const g1 = ctx.createRadialGradient(n1x, n1y, 0, n1x, n1y, rad1);
-            g1.addColorStop(0, `rgba(${c.r}, ${c.g}, ${c.b}, ${0.075 + starViewBoost * 0.05})`);
-            g1.addColorStop(0.55, `rgba(${c.secR}, ${c.secG}, ${c.secB}, 0.03)`);
-            g1.addColorStop(1, 'rgba(0, 0, 0, 0)');
-            ctx.fillStyle = g1;
-            ctx.fillRect(0, 0, viewW, viewH);
+            // 使用離屏快取材質繪製星雲，避免全螢幕逐像素運算漸層
+            const n1x = viewW * (0.32 + Math.sin(time * 0.00004) * 0.06) - parallax.x * 0.4;
+            const n1y = viewH * (0.35 + Math.cos(time * 0.000035) * 0.05) - parallax.y * 0.4;
+            const rad1 = Math.max(viewW, viewH) * 0.52;
+            const nebSprite = getNebulaSprite(c.r, c.g, c.b, c.secR, c.secG, c.secB);
 
-            // Background Twinkling Stars
-            for (let s of bgStars) {
+            ctx.save();
+            ctx.globalAlpha = 0.075 + starViewBoost * 0.05;
+            ctx.drawImage(nebSprite, n1x - rad1, n1y - rad1, rad1 * 2, rad1 * 2);
+            ctx.restore();
+
+            // 將背景繁星依亮度分組為 4 次批次繪製，取代每幀上百次獨立 fill()
+            for (let b = 0; b < 4; b++) starBuckets[b].length = 0;
+
+            const bgAngle = time * 0.000005;
+            const cosB = Math.cos(bgAngle);
+            const sinB = Math.sin(bgAngle);
+            for (let i = 0; i < bgStars.length; i++) {
+                const s = bgStars[i];
                 const twinkle = 0.55 + 0.45 * Math.sin(time * s.twinkleSpeed + s.phase);
-                const sx = (s.x * viewW - parallax.x * s.depth + viewW) % viewW;
-                const sy = (s.y * viewH - parallax.y * s.depth + viewH) % viewH;
-                ctx.fillStyle = `rgba(226, 240, 255, ${s.baseAlpha * twinkle})`;
+                const a = s.baseAlpha * twinkle;
+                const tier = a < 0.26 ? 0 : (a < 0.43 ? 1 : (a < 0.6 ? 2 : 3));
+
+                const dx = s.x - 0.5;
+                const dy = s.y - 0.5;
+                const rx = 0.5 + (dx * cosB - dy * sinB) * 1.15;
+                const ry = 0.5 + (dx * sinB + dy * cosB) * 1.15;
+                s.sx = (rx * viewW - parallax.x * s.depth + viewW * 2) % viewW;
+                s.sy = (ry * viewH - parallax.y * s.depth + viewH * 2) % viewH;
+                starBuckets[tier].push(s);
+            }
+
+            for (let b = 0; b < 4; b++) {
+                const bucket = starBuckets[b];
+                if (bucket.length === 0) continue;
+                ctx.fillStyle = `rgba(226, 240, 255, ${STAR_ALPHA_TIERS[b]})`;
                 ctx.beginPath();
-                ctx.arc(sx, sy, s.size, 0, Math.PI * 2);
+                for (let j = 0; j < bucket.length; j++) {
+                    const st = bucket[j];
+                    ctx.moveTo(st.sx + st.size, st.sy);
+                    ctx.arc(st.sx, st.sy, st.size, 0, Math.PI * 2);
+                }
                 ctx.fill();
             }
 
-            // Occasional Shooting Star (「如露亦如電」)
-            if (!shootingStar && Math.random() < 0.0035) {
+            // 偶爾劃過天際的流星（「如露亦如電」）
+            if (!shootingStar && Math.random() < 0.003 * dtScale) {
                 shootingStar = {
                     x: Math.random() * viewW * 0.8 + viewW * 0.1,
                     y: Math.random() * viewH * 0.35,
@@ -926,9 +1078,9 @@
                 };
             }
             if (shootingStar) {
-                shootingStar.x += shootingStar.vx;
-                shootingStar.y += shootingStar.vy;
-                shootingStar.life -= 0.022;
+                shootingStar.x += shootingStar.vx * dtScale;
+                shootingStar.y += shootingStar.vy * dtScale;
+                shootingStar.life -= 0.022 * dtScale;
                 if (shootingStar.life <= 0) {
                     shootingStar = null;
                 } else {
@@ -947,13 +1099,15 @@
             }
         }
 
-        function drawRealmParticles(time) {
+        function drawRealmParticles(time, dtScale) {
             const c = currentTheme;
+            const fireSprite = currentMotif === 'fire' ? getGlowSprite(248, 140, 80) : null;
+
             for (let i = 0; i < realmParticles.length; i++) {
                 let p = realmParticles[i];
-                p.y += p.vy;
-                p.x += p.vx + Math.sin(time * 0.001 + p.swayPhase) * 0.00025;
-                p.rot += p.rotSpeed;
+                p.y += p.vy * dtScale;
+                p.x += (p.vx + Math.sin(time * 0.001 + p.swayPhase) * 0.00025) * dtScale;
+                p.rot += p.rotSpeed * dtScale;
 
                 if (p.y < -0.05 || p.x < -0.05 || p.x > 1.05) {
                     realmParticles[i] = createRealmParticle(false);
@@ -964,42 +1118,34 @@
                 const py = p.y * viewH;
                 const a = p.alpha * (0.7 + starViewBoost * 0.3);
 
+                if (currentMotif === 'fire' && fireSprite) {
+                    const d = p.size * 4.2;
+                    ctx.save();
+                    ctx.globalAlpha = Math.min(1, a);
+                    ctx.drawImage(fireSprite, px - d * 0.5, py - d * 0.5, d, d);
+                    ctx.restore();
+                    continue;
+                }
+
                 ctx.save();
                 ctx.translate(px, py);
                 ctx.rotate(p.rot);
 
                 if (currentMotif === 'bubble') {
-                    // 夢幻泡影：透明微光水泡
-                    ctx.strokeStyle = `rgba(${c.r}, ${c.g}, ${c.b}, ${a * 0.85})`;
+                    ctx.strokeStyle = `rgba(${c.r | 0}, ${c.g | 0}, ${c.b | 0}, ${a * 0.85})`;
                     ctx.lineWidth = 0.9;
                     ctx.beginPath();
                     ctx.arc(0, 0, p.size * 1.4, 0, Math.PI * 2);
                     ctx.stroke();
-                    ctx.fillStyle = `rgba(255, 255, 255, ${a * 0.4})`;
-                    ctx.beginPath();
-                    ctx.arc(-p.size * 0.45, -p.size * 0.45, p.size * 0.3, 0, Math.PI * 2);
-                    ctx.fill();
-                } else if (currentMotif === 'fire') {
-                    // 紅蓮業火：上升星火金燼
-                    const fg = ctx.createRadialGradient(0, 0, 0, 0, 0, p.size * 1.6);
-                    fg.addColorStop(0, `rgba(254, 240, 138, ${a})`);
-                    fg.addColorStop(0.5, `rgba(248, 113, 113, ${a * 0.65})`);
-                    fg.addColorStop(1, 'rgba(248, 113, 113, 0)');
-                    ctx.fillStyle = fg;
-                    ctx.beginPath();
-                    ctx.arc(0, 0, p.size * 1.6, 0, Math.PI * 2);
-                    ctx.fill();
                 } else if (currentMotif === 'petal') {
-                    // 虛空蓮瓣：飄舞微光花瓣
-                    ctx.fillStyle = `rgba(${c.r}, ${c.g}, ${c.b}, ${a * 0.6})`;
+                    ctx.fillStyle = `rgba(${c.r | 0}, ${c.g | 0}, ${c.b | 0}, ${a * 0.6})`;
                     ctx.beginPath();
                     ctx.moveTo(0, -p.size * 1.3);
                     ctx.quadraticCurveTo(p.size, 0, 0, p.size * 1.3);
                     ctx.quadraticCurveTo(-p.size, 0, 0, -p.size * 1.3);
                     ctx.fill();
                 } else if (currentMotif === 'shard') {
-                    // 諸相非相：琉璃金剛鏡片
-                    ctx.strokeStyle = `rgba(${c.r}, ${c.g}, ${c.b}, ${a * 0.8})`;
+                    ctx.strokeStyle = `rgba(${c.r | 0}, ${c.g | 0}, ${c.b | 0}, ${a * 0.8})`;
                     ctx.lineWidth = 0.85;
                     ctx.beginPath();
                     ctx.moveTo(0, -p.size * 1.4);
@@ -1009,8 +1155,7 @@
                     ctx.closePath();
                     ctx.stroke();
                 } else {
-                    // 般若微塵
-                    ctx.fillStyle = `rgba(${c.r}, ${c.g}, ${c.b}, ${a * 0.65})`;
+                    ctx.fillStyle = `rgba(${c.r | 0}, ${c.g | 0}, ${c.b | 0}, ${a * 0.65})`;
                     ctx.beginPath();
                     ctx.arc(0, 0, p.size * 0.65, 0, Math.PI * 2);
                     ctx.fill();
@@ -1020,73 +1165,74 @@
             }
         }
 
-        function drawConstellationLayer(time) {
+        function drawConstellationLayer(time, dtScale) {
             if (constellation.length === 0) return;
 
-            const pxOffset = parallax.x * 0.65;
-            const pyOffset = parallax.y * 0.65;
+            const screenCoords = constellation.map(star => getStarScreenPos(star, time));
 
-            // Advance reveal progress on newest star
-            const lastStar = constellation[constellation.length - 1];
+            const lastIdx = constellation.length - 1;
+            const lastStar = constellation[lastIdx];
             if (lastStar.revealProgress < 1) {
-                lastStar.revealProgress = Math.min(1, lastStar.revealProgress + 0.014);
+                lastStar.revealProgress = Math.min(1, lastStar.revealProgress + 0.016 * dtScale);
                 if (lastStar.revealProgress >= 1 && !lastStar.burstDone) {
                     lastStar.burstDone = true;
                     triggerStarArrivalBurst(
-                        lastStar.x * viewW + pxOffset,
-                        lastStar.y * viewH + pyOffset,
+                        screenCoords[lastIdx].px,
+                        screenCoords[lastIdx].py,
                         lastStar.color
                     );
                 }
             }
 
-            // 1. Draw Luminous Karmic Silk Threads (星軌連線)
+            // 1. 繪製雙層無陰影光絲星軌（完全移除昂貴的 ctx.shadowBlur 高斯模糊運算）
             if (constellation.length > 1) {
                 for (let i = 1; i < constellation.length; i++) {
                     const prev = constellation[i - 1];
                     const curr = constellation[i];
-                    const x1 = prev.x * viewW + pxOffset;
-                    const y1 = prev.y * viewH + pyOffset;
-                    const x2 = curr.x * viewW + pxOffset;
-                    const y2 = curr.y * viewH + pyOffset;
+                    const x1 = screenCoords[i - 1].px;
+                    const y1 = screenCoords[i - 1].py;
+                    const x2 = screenCoords[i].px;
+                    const y2 = screenCoords[i].py;
 
-                    const prog = i === constellation.length - 1 ? curr.revealProgress : 1;
+                    const prog = i === lastIdx ? curr.revealProgress : 1;
                     const ex = x1 + (x2 - x1) * prog;
                     const ey = y1 + (y2 - y1) * prog;
 
-                    // Outer soft glow line
+                    // 外層柔和寬光暈線
+                    ctx.strokeStyle = `rgba(${curr.color.r}, ${curr.color.g}, ${curr.color.b}, ${0.15 + starViewBoost * 0.14})`;
+                    ctx.lineWidth = 4.6 + starViewBoost * 1.4;
+                    ctx.lineCap = 'round';
+                    ctx.beginPath();
+                    ctx.moveTo(x1, y1);
+                    ctx.lineTo(ex, ey);
+                    ctx.stroke();
+
+                    // 中層漸層星軌線
                     const lineGrad = ctx.createLinearGradient(x1, y1, x2, y2);
-                    lineGrad.addColorStop(0, `rgba(${prev.color.r}, ${prev.color.g}, ${prev.color.b}, ${0.35 + starViewBoost * 0.35})`);
-                    lineGrad.addColorStop(1, `rgba(${curr.color.r}, ${curr.color.g}, ${curr.color.b}, ${0.55 + starViewBoost * 0.35})`);
-
-                    ctx.save();
+                    lineGrad.addColorStop(0, `rgba(${prev.color.r}, ${prev.color.g}, ${prev.color.b}, ${0.42 + starViewBoost * 0.35})`);
+                    lineGrad.addColorStop(1, `rgba(${curr.color.r}, ${curr.color.g}, ${curr.color.b}, ${0.65 + starViewBoost * 0.3})`);
                     ctx.strokeStyle = lineGrad;
-                    ctx.lineWidth = 1.8 + starViewBoost * 0.8;
-                    ctx.shadowBlur = 12;
-                    ctx.shadowColor = `rgba(${curr.color.r}, ${curr.color.g}, ${curr.color.b}, 0.75)`;
+                    ctx.lineWidth = 1.6 + starViewBoost * 0.6;
                     ctx.beginPath();
                     ctx.moveTo(x1, y1);
                     ctx.lineTo(ex, ey);
                     ctx.stroke();
 
-                    // Inner crisp silver-gold filament
+                    // 內層銀白光蕊細絲
                     ctx.strokeStyle = `rgba(255, 255, 255, ${0.28 + starViewBoost * 0.32})`;
-                    ctx.lineWidth = 0.7;
+                    ctx.lineWidth = 0.65;
                     ctx.beginPath();
                     ctx.moveTo(x1, y1);
                     ctx.lineTo(ex, ey);
                     ctx.stroke();
-                    ctx.restore();
 
-                    // Leading Comet Head when drawing newest line
                     if (prog < 1) {
                         drawStarFlare(ex, ey, 3.8, 12, curr.color, 0.95);
                     } else {
-                        // Flowing Prana Light Bead gliding along completed links
-                        const flowT = ((time * 0.00038 + i * 0.27) % 1);
+                        const flowT = ((time * 0.0001 + i * 0.27) % 1);
                         const bx = x1 + (x2 - x1) * flowT;
                         const by = y1 + (y2 - y1) * flowT;
-                        ctx.fillStyle = `rgba(255, 255, 255, ${0.45 + starViewBoost * 0.4})`;
+                        ctx.fillStyle = `rgba(255, 255, 255, ${0.48 + starViewBoost * 0.4})`;
                         ctx.beginPath();
                         ctx.arc(bx, by, 1.8, 0, Math.PI * 2);
                         ctx.fill();
@@ -1094,29 +1240,27 @@
                 }
             }
 
-            // 2. Draw Each Star & Sacred Label
+            // 2. 繪製星辰與快取寬度文字題籤
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
 
             for (let i = 0; i < constellation.length; i++) {
                 const p = constellation[i];
-                const px = p.x * viewW + pxOffset;
-                const py = p.y * viewH + pyOffset;
-                const alpha = (i === constellation.length - 1)
+                const { px, py, normY } = screenCoords[i];
+                const alpha = (i === lastIdx)
                     ? Math.max(0, (p.revealProgress - 0.65) / 0.35)
                     : 1;
 
                 if (alpha <= 0.01) continue;
 
-                const pulse = 1 + Math.sin(time * 0.003 + p.pulsePhase) * 0.16;
+                const pulse = 1 + Math.sin(time * 0.0009 + p.pulsePhase) * 0.12;
                 const baseRadius = (p.isMajor ? 4.8 : 3.6) * pulse;
                 const spikeLen = (p.isMajor ? 15 : 10) * (0.85 + starViewBoost * 0.35);
 
-                // Sacred Diamond Halo for Major Nodes (起點 / 四相 / 結局) or Latest Star
-                if (p.isMajor || i === constellation.length - 1) {
+                if (p.isMajor || i === lastIdx) {
                     ctx.save();
                     ctx.translate(px, py);
-                    ctx.rotate(time * 0.0008 + i);
+                    ctx.rotate(time * 0.00012 + i);
                     const dSize = (p.isMajor ? 11 : 9) * pulse;
                     ctx.strokeStyle = `rgba(${p.color.r}, ${p.color.g}, ${p.color.b}, ${alpha * (0.45 + starViewBoost * 0.35)})`;
                     ctx.lineWidth = 0.9;
@@ -1124,21 +1268,17 @@
                     ctx.restore();
                 }
 
-                // Star Flare & Aura
                 drawStarFlare(px, py, baseRadius, spikeLen, p.color, alpha * (0.78 + starViewBoost * 0.22));
 
-                // Calligraphic Star Name Label
-                const labelY = p.y < 0.22 ? py + 24 : py - 24;
-                const labelText = p.title;
-                ctx.save();
-                ctx.font = `${p.isMajor ? '600' : '400'} 13px "Noto Serif TC", serif`;
-                const textWidth = ctx.measureText(labelText).width;
+                const labelY = normY < 0.26 ? py + 23 : py - 23;
+                ctx.font = `${p.isMajor ? '600' : '400'} 12.5px "Noto Serif TC", serif`;
+                if (!p.labelWidth) {
+                    p.labelWidth = ctx.measureText(p.title).width;
+                }
 
-                // Subtle translucent pill halo behind text for clarity
-                const padX = 8;
-                const pillW = textWidth + padX * 2;
-                const pillH = 20;
-                ctx.fillStyle = `rgba(4, 7, 15, ${alpha * (0.45 + starViewBoost * 0.35)})`;
+                const pillW = p.labelWidth + 14;
+                const pillH = 19;
+                ctx.fillStyle = `rgba(4, 7, 15, ${alpha * (0.52 + starViewBoost * 0.32)})`;
                 ctx.beginPath();
                 if (ctx.roundRect) {
                     ctx.roundRect(px - pillW / 2, labelY - pillH / 2, pillW, pillH, 10);
@@ -1147,23 +1287,26 @@
                 }
                 ctx.fill();
 
-                ctx.shadowBlur = 8;
-                ctx.shadowColor = `rgba(${p.color.r}, ${p.color.g}, ${p.color.b}, ${alpha * 0.8})`;
-                ctx.fillStyle = `rgba(241, 245, 249, ${alpha * (0.82 + starViewBoost * 0.18)})`;
-                ctx.fillText(labelText, px, labelY);
-                ctx.restore();
+                if (p.isMajor) {
+                    ctx.strokeStyle = `rgba(${p.color.r}, ${p.color.g}, ${p.color.b}, ${alpha * 0.35})`;
+                    ctx.lineWidth = 0.75;
+                    ctx.stroke();
+                }
+
+                ctx.fillStyle = `rgba(241, 245, 249, ${alpha * (0.84 + starViewBoost * 0.16)})`;
+                ctx.fillText(p.title, px, labelY);
             }
         }
 
-        function drawRipplesAndBursts() {
-            // Star arrival burst sparks
+        function drawRipplesAndBursts(dtScale) {
             for (let i = starBursts.length - 1; i >= 0; i--) {
                 const b = starBursts[i];
-                b.x += b.vx;
-                b.y += b.vy;
-                b.vx *= 0.96;
-                b.vy *= 0.96;
-                b.alpha -= 0.02;
+                b.x += b.vx * dtScale;
+                b.y += b.vy * dtScale;
+                const drag = Math.pow(0.96, dtScale);
+                b.vx *= drag;
+                b.vy *= drag;
+                b.alpha -= 0.02 * dtScale;
                 if (b.alpha <= 0) {
                     starBursts.splice(i, 1);
                     continue;
@@ -1174,16 +1317,15 @@
                 ctx.fill();
             }
 
-            // Touch & Star Lotus Ripples
             for (let i = touchRipples.length - 1; i >= 0; i--) {
                 const rp = touchRipples[i];
-                rp.r += (rp.maxR - rp.r) * 0.055 + 0.6;
-                rp.alpha *= 0.955;
+                rp.r += ((rp.maxR - rp.r) * 0.055 + 0.6) * dtScale;
+                rp.alpha *= Math.pow(0.955, dtScale);
                 if (rp.alpha < 0.015 || rp.r >= rp.maxR) {
                     touchRipples.splice(i, 1);
                     continue;
                 }
-                ctx.strokeStyle = `rgba(${rp.color.r}, ${rp.color.g}, ${rp.color.b}, ${rp.alpha})`;
+                ctx.strokeStyle = `rgba(${rp.color.r | 0}, ${rp.color.g | 0}, ${rp.color.b | 0}, ${rp.alpha})`;
                 ctx.lineWidth = 1.2;
                 ctx.beginPath();
                 ctx.arc(rp.x, rp.y, rp.r, 0, Math.PI * 2);
@@ -1192,8 +1334,28 @@
         }
 
         function masterAnimateLoop(time) {
-            // Smoothly interpolate theme colors & boost
-            const lerp = 0.035;
+            if (!isPageVisible) {
+                rafId = null;
+                return;
+            }
+            rafId = requestAnimationFrame(masterAnimateLoop);
+
+            // 智慧節能幀率：觀星轉場與互動漣漪時維持流暢 50 FPS；靜態閱讀文字時自動降頻至 24 FPS（同時避免 120Hz 螢幕過熱）
+            const hasActiveFX =
+                targetStarViewBoost > 0.1 ||
+                starViewBoost > 0.15 ||
+                touchRipples.length > 0 ||
+                starBursts.length > 0 ||
+                (constellation.length > 0 && constellation[constellation.length - 1].revealProgress < 1);
+
+            const minInterval = hasActiveFX ? 20 : 41;
+            const elapsed = time - lastFrameTime;
+            if (elapsed < minInterval) return;
+
+            const dtScale = Math.min(2.6, Math.max(0.5, elapsed / 16.667));
+            lastFrameTime = time;
+
+            const lerp = Math.min(1, 0.035 * dtScale);
             currentTheme.r += (targetTheme.r - currentTheme.r) * lerp;
             currentTheme.g += (targetTheme.g - currentTheme.g) * lerp;
             currentTheme.b += (targetTheme.b - currentTheme.b) * lerp;
@@ -1201,19 +1363,17 @@
             currentTheme.secG += (targetTheme.secG - currentTheme.secG) * lerp;
             currentTheme.secB += (targetTheme.secB - currentTheme.secB) * lerp;
 
-            starViewBoost += (targetStarViewBoost - starViewBoost) * 0.06;
-            parallax.x += (parallax.tx - parallax.x) * 0.05;
-            parallax.y += (parallax.ty - parallax.y) * 0.05;
+            starViewBoost += (targetStarViewBoost - starViewBoost) * Math.min(1, 0.06 * dtScale);
+            parallax.x += (parallax.tx - parallax.x) * Math.min(1, 0.05 * dtScale);
+            parallax.y += (parallax.ty - parallax.y) * Math.min(1, 0.05 * dtScale);
 
             ctx.clearRect(0, 0, viewW, viewH);
 
-            drawNebulaAndStars(time);
+            drawNebulaAndStars(time, dtScale);
             drawSacredMandala(time);
-            drawRealmParticles(time);
-            drawConstellationLayer(time);
-            drawRipplesAndBursts();
-
-            requestAnimationFrame(masterAnimateLoop);
+            drawRealmParticles(time, dtScale);
+            drawConstellationLayer(time, dtScale);
+            drawRipplesAndBursts(dtScale);
         }
 
         // ==========================================
@@ -1500,6 +1660,13 @@
             const labWrap = document.getElementById('mala-labyrinth');
             if (!encWrap || !labWrap) return;
 
+            // 法輪暗紋改為隨關卡推進優雅轉動一格，平時完全靜止不耗電
+            const watermark = document.querySelector('.dharma-watermark');
+            if (watermark) {
+                const deg = state.encounterCount * 22.5 + state.loop * 45;
+                watermark.style.transform = `rotate(${deg}deg)`;
+            }
+
             encWrap.innerHTML = '';
             labWrap.innerHTML = '';
 
@@ -1556,26 +1723,36 @@
             ZenAudio.playChime();
             targetStarViewBoost = 1;
 
-            summary.innerHTML = `第 <span class="text-purple-300 font-medium">${state.loop}</span> 世輪迴 ｜ 證境：<span class="text-amber-200 font-medium">${endingTitle || '圓滿'}</span> ｜ 覺悟 ${state.enl} · 福德 ${state.mer} · 執著 ${state.att}`;
+            summary.innerHTML = `
+                <div class="whitespace-nowrap">第 <span class="text-purple-300 font-medium">${state.loop}</span> 世輪迴 ｜ 證境：<span class="text-amber-200 font-medium">${endingTitle || '圓滿'}</span></div>
+                <div class="whitespace-nowrap text-[11px] text-slate-300/80 mt-0.5">覺悟 ${state.enl} · 福德 ${state.mer} · 執著 ${state.att}</div>
+            `;
 
             mainCard.style.opacity = '0';
             mainCard.style.transform = 'scale(0.97)';
             mainCard.style.pointerEvents = 'none';
             overlay.style.display = 'flex';
+            void overlay.offsetWidth;
+            overlay.classList.add('visible');
 
             overlay.onclick = () => {
+                overlay.onclick = null;
                 ZenAudio.playChime();
-                targetStarViewBoost = 0.35;
-                mainCard.style.opacity = '1';
-                mainCard.style.transform = 'scale(1)';
-                mainCard.style.pointerEvents = 'auto';
-                overlay.style.display = 'none';
+                overlay.classList.remove('visible');
+                targetStarViewBoost = 0.45;
 
                 setTimeout(() => {
-                    mainCard.style.opacity = '';
-                    mainCard.style.transform = '';
-                    mainCard.style.pointerEvents = '';
-                }, 950);
+                    overlay.style.display = 'none';
+                    mainCard.style.opacity = '1';
+                    mainCard.style.transform = 'scale(1)';
+                    mainCard.style.pointerEvents = 'auto';
+
+                    setTimeout(() => {
+                        mainCard.style.opacity = '';
+                        mainCard.style.transform = '';
+                        mainCard.style.pointerEvents = '';
+                    }, 800);
+                }, 480);
             };
         }
 
@@ -1600,38 +1777,54 @@
         }
 
         function formatStoryHtml(rawHtml, nodeId) {
-            // 將開頭的【...】標題優雅地提煉為禪意章節橫幅
+            // 將開頭的【...】標題提煉為絕不跳行的單行禪意章節橫幅
             const headerRegex = /^<span class=['"]([^'"]+)['"]>【(.*?)】<\/span>(?:<br\s*\/?>)*/i;
             const match = rawHtml.match(headerRegex);
+            const isEnd = nodeId.startsWith('end_');
 
             let stageSubtitle = '';
             if (nodeId.startsWith('enc_')) {
                 stageSubtitle = `星辰幻境 ・ 第 ${state.encounterCount} 境`;
             } else if (nodeId.startsWith('labyrinth_')) {
                 stageSubtitle = `金剛般若 ・ 四相試煉`;
-            } else if (nodeId.startsWith('end_')) {
+            } else if (isEnd) {
                 stageSubtitle = `因果圓成 ・ 命運終境`;
             }
 
             if (match) {
-                const spanClass = match[1];
-                const titleInside = match[2];
-                const bodyHtml = rawHtml.replace(headerRegex, '');
+                // 移除舊有固定字級 class，統一交由單行自適應 .realm-title 控制避免跳行
+                const cleanGlowClass = match[1].replace(/\btext-(xs|sm|base|lg|xl|2xl|3xl|4xl)\b/g, '').trim();
+                let titleInside = match[2];
+
+                // 若標題含有「 - 」（如「諸相非相迷宮 - 第一層：我相」），優雅拆分為副標與主標避免過長換行
+                if (titleInside.includes(' - ')) {
+                    const parts = titleInside.split(/\s*-\s*/);
+                    stageSubtitle = `金剛般若 ・ ${parts[0]}`;
+                    titleInside = parts.slice(1).join('・');
+                }
+
+                const compactBodyHtml = rawHtml
+                    .replace(headerRegex, '')
+                    .replace(/(?:<br\s*\/?>\s*){2,}/gi, '<div class="h-2 sm:h-2.5"></div>');
+
                 return `
                     <div class="realm-header">
-                        ${stageSubtitle ? `<span class="text-[11px] tracking-[0.32em] text-slate-400/80 mb-1.5">${stageSubtitle}</span>` : ''}
-                        <div class="${spanClass} tracking-[0.18em]">【${titleInside}】</div>
+                        ${stageSubtitle ? `<span class="text-[10px] sm:text-[11px] tracking-[0.28em] text-slate-400/80 mb-1 whitespace-nowrap">${stageSubtitle}</span>` : ''}
+                        <div class="${cleanGlowClass} realm-title ${isEnd ? 'ending-title' : ''}">【${titleInside}】</div>
+                        <div class="realm-divider"><span>❖</span></div>
                     </div>
-                    <div class="leading-loose tracking-wider text-slate-200/95 font-light">${bodyHtml}</div>
+                    <div class="leading-relaxed tracking-wider text-slate-200/95 font-light">${compactBodyHtml}</div>
                 `;
             }
 
+            const compactStartHtml = rawHtml.replace(/(?:<br\s*\/?>\s*){2,}/gi, '<div class="h-2 sm:h-2.5"></div>');
             return `
                 <div class="realm-header">
-                    <span class="text-[11px] tracking-[0.35em] text-cyan-300/75 mb-1">金剛般若波羅蜜</span>
-                    <div class="glow-white text-lg tracking-[0.25em]">【虛空初醒】</div>
+                    <span class="text-[10px] sm:text-[11px] tracking-[0.32em] text-cyan-300/75 mb-1 whitespace-nowrap">金剛般若波羅蜜</span>
+                    <div class="glow-white realm-title">【虛空初醒】</div>
+                    <div class="realm-divider"><span>❖</span></div>
                 </div>
-                <div class="leading-loose tracking-wider text-slate-200/95 font-light">${rawHtml}</div>
+                <div class="leading-relaxed tracking-wider text-slate-200/95 font-light">${compactStartHtml}</div>
             `;
         }
 
@@ -1674,13 +1867,12 @@
             storyContainer.innerHTML = '';
             choicesContainer.innerHTML = '';
 
-            // 2. 進入透明觀星轉場模式
-            if (!nodeId.startsWith('end_')) {
-                mainCard.classList.add('transition-mode');
-            }
+            // 2. 所有場景（包含結局前）一律先隱去主卡片，避免偈語與結局版面重疊
+            mainCard.classList.remove('ending-mode');
+            mainCard.classList.add('transition-mode');
             targetStarViewBoost = 1;
 
-            // 3. 繪製新星辰與流光連線，展示金剛經禪偈並等待玩家輕觸繼續
+            // 3. 繪製新星辰與流光連線，先浮現禪偈，點擊後等禪偈完全淡出再顯示下一個畫面／結局
             const isMajorStar = !nodeId.startsWith('enc_');
             if (node.title) {
                 const isFirst = constellation.length === 0;
@@ -1694,19 +1886,27 @@
                         setTimeout(() => {
                             const overlay = document.getElementById('continue-overlay');
                             overlay.style.display = 'flex';
+                            void overlay.offsetWidth;
+                            overlay.classList.add('visible');
+
                             overlay.onclick = () => {
+                                overlay.onclick = null;
                                 ZenAudio.playChime();
-                                overlay.style.display = 'none';
-                                resolve();
+                                overlay.classList.remove('visible');
+                                // 等待 sutra_gathas 完全淡出後，才進入結局或下一幻境
+                                setTimeout(() => {
+                                    overlay.style.display = 'none';
+                                    resolve();
+                                }, 550);
                             };
-                        }, 650);
+                        }, 620);
                     });
                 } else {
                     await new Promise(resolve => setTimeout(resolve, 680));
                 }
             }
 
-            // 4. 恢復琉璃經閣介面
+            // 4. 偈語已徹底淡出，恢復琉璃經閣介面（或進入結局半透明模式）
             mainCard.classList.remove('transition-mode');
 
             if (nodeId.startsWith('end_')) {
@@ -1720,13 +1920,13 @@
                 }
             }
 
-            // 5. 渲染水墨霧化漸顯內文
+            // 5. 渲染水墨霧化漸顯內文（精練行距以適配單一畫面）
             const textEl = document.createElement('div');
-            textEl.className = 'text-base sm:text-lg mist-reveal';
+            textEl.className = 'text-[15px] sm:text-base mist-reveal';
             textEl.innerHTML = formatStoryHtml(rawHtml, nodeId);
             storyContainer.appendChild(textEl);
 
-            // 6. 渲染黑曜玉簡選項
+            // 6. 渲染緊湊精緻的黑曜玉簡選項
             if (node.choices) {
                 let availableChoices = node.choices.filter(c => {
                     if (c.cond && !c.cond(state)) return false;
@@ -1754,8 +1954,8 @@
                 availableChoices.forEach((choice, index) => {
                     const btn = document.createElement('button');
                     const isSpecial = /【(隱藏|覺醒|金剛|觀想)】/.test(choice.text);
-                    btn.className = `glass-btn ${isSpecial ? 'special-choice' : ''} w-full px-4 py-3.5 sm:p-4 rounded-xl text-slate-200 tracking-wider text-sm sm:text-base text-left flex justify-between items-center group fade-in`;
-                    btn.style.animationDelay = `${0.12 + index * 0.09}s`;
+                    btn.className = `glass-btn ${isSpecial ? 'special-choice' : ''} w-full px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl text-slate-200 tracking-wide text-[13.5px] sm:text-[15px] text-left flex justify-between items-center group fade-in`;
+                    btn.style.animationDelay = `${0.1 + index * 0.08}s`;
 
                     let displayText = choice.text;
                     if (isSpecial) {
@@ -1763,11 +1963,11 @@
                     }
 
                     btn.innerHTML = `
-                        <div class="flex items-start gap-3 pr-3">
-                            <span class="mt-1.5 text-[10px] ${isSpecial ? 'text-amber-300' : 'text-cyan-300/50'} group-hover:rotate-45 group-hover:text-amber-200 transition-all duration-300 shrink-0">◇</span>
-                            <span class="leading-relaxed font-light group-hover:text-white transition-colors">${displayText}</span>
+                        <div class="flex items-center gap-2.5 pr-2">
+                            <span class="text-[9px] ${isSpecial ? 'text-amber-300' : 'text-cyan-300/50'} group-hover:rotate-45 group-hover:text-amber-200 transition-all duration-300 shrink-0">◇</span>
+                            <span class="leading-snug font-light group-hover:text-white transition-colors">${displayText}</span>
                         </div>
-                        <span class="text-white/25 text-lg font-light group-hover:text-amber-200 group-hover:translate-x-0.5 transition-all shrink-0">›</span>
+                        <span class="text-white/25 text-base font-light group-hover:text-amber-200 group-hover:translate-x-0.5 transition-all shrink-0">›</span>
                     `;
 
                     btn.onclick = () => {
@@ -1814,7 +2014,8 @@
 
         // --- Init ---
         window.onload = () => {
-            requestAnimationFrame(masterAnimateLoop);
+            lastFrameTime = performance.now();
+            rafId = requestAnimationFrame(masterAnimateLoop);
             initRun();
             updateUI();
             renderNode('start');
