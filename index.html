@@ -2,207 +2,751 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>金剛經：星辰幻境</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@200;300;400;500;600;700&display=swap');
 
         :root {
-            --cyan-glow: rgba(34, 211, 238, 0.7);
-            --gold-glow: rgba(252, 211, 77, 0.7);
-            --purple-glow: rgba(192, 132, 252, 0.7);
-            --red-glow: rgba(248, 113, 113, 0.7);
-            --bg-color: #030305;
+            --cyan-glow: rgba(34, 211, 238, 0.75);
+            --gold-glow: rgba(252, 211, 77, 0.75);
+            --purple-glow: rgba(192, 132, 252, 0.75);
+            --red-glow: rgba(248, 113, 113, 0.75);
+            --bg-color: #020308;
+            --theme-rgb: 34, 211, 238;
         }
 
         body, html {
             margin: 0;
             padding: 0;
             width: 100%;
-            height: 100%;
+            height: 100vh;
+            height: 100dvh;
             font-family: 'Noto Serif TC', serif;
             background-color: var(--bg-color);
             color: #e5e7eb;
-            overflow: hidden; /* Prevent scrolling on body, handle inside main */
+            overflow: hidden;
             user-select: none;
             -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding-top: env(safe-area-inset-top, 0px);
+            padding-bottom: env(safe-area-inset-bottom, 0px);
         }
 
-        /* Canvas Background */
+        /* Fullscreen Living Cosmos Canvas */
         #starmap {
             position: fixed;
-            top: 0;
-            left: 0;
+            inset: 0;
             width: 100%;
             height: 100%;
             z-index: 0;
-            background: radial-gradient(ellipse at center, #0a0d18 0%, #020203 100%);
+            background: radial-gradient(ellipse at 50% 40%, #0b1021 0%, #04050c 65%, #010103 100%);
         }
 
-        /* Glassmorphism Main Card */
+        /* Subtle Vignette & Film Grain Overlay */
+        .zen-vignette {
+            position: fixed;
+            inset: 0;
+            z-index: 2;
+            pointer-events: none;
+            background: radial-gradient(circle at center, transparent 45%, rgba(1, 2, 6, 0.72) 100%);
+        }
+
+        /* Glassmorphism Sutra Pavilion Card */
         .glass-container {
             position: relative;
             z-index: 10;
-            width: 95%;
-            max-width: 700px;
-            height: 90vh; /* Fallback for older browsers */
-            height: 90dvh; /* Dynamic Viewport Height fixes Safari bottom bar issue */
-            margin: 5vh auto;
-            margin: 5dvh auto;
+            width: min(94%, 680px);
+            height: calc(100vh - 2.5rem);
+            height: calc(100dvh - 1.5rem - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+            max-height: 88dvh;
             display: flex;
             flex-direction: column;
-            background: rgba(10, 12, 20, 0.65);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: linear-gradient(165deg, rgba(12, 16, 28, 0.74) 0%, rgba(6, 8, 16, 0.82) 100%);
+            backdrop-filter: blur(16px) saturate(135%);
+            -webkit-backdrop-filter: blur(16px) saturate(135%);
+            border: 1px solid rgba(var(--theme-rgb), 0.22);
             border-radius: 1.5rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
-            transition: all 1.5s ease-in-out;
+            box-shadow:
+                0 30px 60px -15px rgba(0, 0, 0, 0.85),
+                0 0 35px -10px rgba(var(--theme-rgb), 0.18),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
+            transition:
+                background 1.1s cubic-bezier(0.22, 1, 0.36, 1),
+                backdrop-filter 1.1s cubic-bezier(0.22, 1, 0.36, 1),
+                border-color 0.9s ease,
+                box-shadow 0.9s ease,
+                opacity 0.9s ease,
+                transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+            overflow: hidden;
         }
 
         .glass-container.ending-mode {
-            background: rgba(5, 7, 12, 0.15);
-            backdrop-filter: blur(3px);
-            -webkit-backdrop-filter: blur(3px);
-            border-color: rgba(255, 255, 255, 0.05);
-            box-shadow: none;
+            background: linear-gradient(165deg, rgba(6, 9, 18, 0.32) 0%, rgba(3, 5, 10, 0.42) 100%);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border-color: rgba(var(--theme-rgb), 0.28);
+            box-shadow: 0 0 50px -12px rgba(var(--theme-rgb), 0.22);
         }
 
-        /* 新增轉場模式，讓星辰圖在選擇後更加清晰 */
+        /* 轉場觀星模式：隱去文字閣樓，將天地還給星辰 */
         .glass-container.transition-mode {
-            background: rgba(0, 0, 0, 0.1);
+            background: rgba(0, 0, 0, 0);
             backdrop-filter: blur(0px);
             -webkit-backdrop-filter: blur(0px);
             border-color: transparent;
             box-shadow: none;
-            transition-duration: 0.5s; /* 讓介面更快透明，把視覺焦點還給星空 */
+            pointer-events: none;
+            transition-duration: 0.45s;
+        }
+        .glass-container.transition-mode .card-ornament,
+        .glass-container.transition-mode header,
+        .glass-container.transition-mode .mala-bar,
+        .glass-container.transition-mode .dharma-watermark {
+            opacity: 0;
+            transition: opacity 0.35s ease;
         }
 
-        /* Glowing Text */
-        .glow-cyan { color: #22d3ee; text-shadow: 0 0 12px var(--cyan-glow); font-weight: 600; }
-        .glow-gold { color: #fcd34d; text-shadow: 0 0 12px var(--gold-glow); font-weight: 600; }
-        .glow-purple { color: #c084fc; text-shadow: 0 0 12px var(--purple-glow); font-weight: 600; }
-        .glow-red { color: #f87171; text-shadow: 0 0 12px var(--red-glow); font-weight: 600; }
-        .glow-white { color: #ffffff; text-shadow: 0 0 12px rgba(255,255,255,0.8); font-weight: 700; }
-        .hidden-tag { color: #8b5cf6; font-size: 0.85em; vertical-align: super; text-shadow: 0 0 5px rgba(139, 92, 246, 0.5); }
+        /* Corner Filigree Ornaments */
+        .card-ornament {
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            pointer-events: none;
+            opacity: 0.45;
+            color: rgb(var(--theme-rgb));
+            transition: opacity 0.6s ease, color 0.9s ease;
+            z-index: 20;
+        }
+        .ornament-tl { top: 10px; left: 10px; }
+        .ornament-tr { top: 10px; right: 10px; transform: scaleX(-1); }
+        .ornament-bl { bottom: 10px; left: 10px; transform: scaleY(-1); }
+        .ornament-br { bottom: 10px; right: 10px; transform: scale(-1, -1); }
 
-        /* Buttons */
+        /* Rotating Subtle Dharma Wheel Watermark inside Card */
+        .dharma-watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 320px;
+            height: 320px;
+            margin-top: -160px;
+            margin-left: -160px;
+            pointer-events: none;
+            opacity: 0.035;
+            color: rgb(var(--theme-rgb));
+            animation: slowSpin 90s linear infinite;
+            transition: opacity 0.6s ease, color 1s ease;
+            z-index: 0;
+        }
+        @keyframes slowSpin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Glowing Typography */
+        .glow-cyan { color: #67e8f9; text-shadow: 0 0 14px var(--cyan-glow), 0 0 28px rgba(34,211,238,0.28); font-weight: 600; }
+        .glow-gold { color: #fde68a; text-shadow: 0 0 14px var(--gold-glow), 0 0 28px rgba(252,211,77,0.28); font-weight: 600; }
+        .glow-purple { color: #d8b4fe; text-shadow: 0 0 14px var(--purple-glow), 0 0 28px rgba(192,132,252,0.28); font-weight: 600; }
+        .glow-red { color: #fca5a5; text-shadow: 0 0 14px var(--red-glow), 0 0 28px rgba(248,113,113,0.28); font-weight: 600; }
+        .glow-white { color: #ffffff; text-shadow: 0 0 16px rgba(255,255,255,0.85), 0 0 32px rgba(165,243,252,0.35); font-weight: 700; }
+
+        .hidden-tag {
+            display: inline-block;
+            color: #fde68a;
+            font-size: 0.78em;
+            letter-spacing: 0.12em;
+            padding: 1px 6px;
+            margin-right: 4px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, rgba(168, 85, 247, 0.28), rgba(251, 191, 36, 0.22));
+            border: 1px solid rgba(252, 211, 77, 0.45);
+            text-shadow: 0 0 8px rgba(252, 211, 77, 0.6);
+            vertical-align: middle;
+        }
+
+        /* Chapter Title Wrapper */
+        .realm-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            margin-bottom: 1.25rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+            position: relative;
+        }
+        .realm-header::after {
+            content: '❖';
+            position: absolute;
+            bottom: -9px;
+            font-size: 11px;
+            color: rgba(var(--theme-rgb), 0.7);
+            background: rgba(10, 14, 24, 0.9);
+            padding: 0 8px;
+            text-shadow: 0 0 8px rgba(var(--theme-rgb), 0.8);
+        }
+
+        /* Obsidian Jade Choice Slips */
         .glass-btn {
-            background: rgba(30, 35, 50, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(135deg, rgba(24, 30, 48, 0.55) 0%, rgba(14, 18, 30, 0.68) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.06);
             position: relative;
             overflow: hidden;
         }
+        .glass-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 60%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(var(--theme-rgb), 0.12), transparent);
+            transform: skewX(-25deg);
+            transition: left 0.65s ease;
+            pointer-events: none;
+        }
+        .glass-btn:hover::before, .glass-btn:active::before {
+            left: 140%;
+        }
         .glass-btn:hover, .glass-btn:active {
-            background: rgba(34, 211, 238, 0.1);
-            border-color: rgba(34, 211, 238, 0.4);
+            background: linear-gradient(135deg, rgba(var(--theme-rgb), 0.15) 0%, rgba(20, 27, 45, 0.78) 100%);
+            border-color: rgba(var(--theme-rgb), 0.48);
             transform: translateY(-2px);
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4), 0 0 10px rgba(34, 211, 238, 0.2) inset;
+            box-shadow: 0 10px 22px rgba(0, 0, 0, 0.45), 0 0 16px rgba(var(--theme-rgb), 0.18) inset;
         }
 
-        /* Animations */
-        .fade-in { animation: fadeIn 0.8s ease-out forwards; opacity: 0; }
+        /* Special Awakened / Vajra Choice Button */
+        .glass-btn.special-choice {
+            background: linear-gradient(135deg, rgba(88, 28, 135, 0.28) 0%, rgba(120, 83, 18, 0.24) 100%);
+            border-color: rgba(252, 211, 77, 0.38);
+            box-shadow: 0 4px 18px rgba(168, 85, 247, 0.18), inset 0 0 12px rgba(252, 211, 77, 0.08);
+        }
+        .glass-btn.special-choice:hover, .glass-btn.special-choice:active {
+            border-color: rgba(252, 211, 77, 0.75);
+            box-shadow: 0 8px 25px rgba(168, 85, 247, 0.32), 0 0 18px rgba(252, 211, 77, 0.22) inset;
+        }
+
+        /* Mala Progress Beads */
+        .mala-bead {
+            width: 6px;
+            height: 6px;
+            border-radius: 9999px;
+            background: rgba(255, 255, 255, 0.14);
+            transition: all 0.5s ease;
+        }
+        .mala-bead.passed {
+            background: rgba(var(--theme-rgb), 0.65);
+            box-shadow: 0 0 6px rgba(var(--theme-rgb), 0.6);
+        }
+        .mala-bead.current {
+            width: 8px;
+            height: 8px;
+            background: #ffffff;
+            box-shadow: 0 0 10px #ffffff, 0 0 16px rgb(var(--theme-rgb));
+        }
+        .mala-diamond {
+            width: 6px;
+            height: 6px;
+            transform: rotate(45deg);
+            background: rgba(255, 255, 255, 0.16);
+            transition: all 0.5s ease;
+        }
+        .mala-diamond.passed {
+            background: #fcd34d;
+            box-shadow: 0 0 8px rgba(252, 211, 77, 0.7);
+        }
+        .mala-diamond.current {
+            width: 8px;
+            height: 8px;
+            background: #fef08a;
+            box-shadow: 0 0 12px #fef08a, 0 0 18px rgba(252, 211, 77, 0.9);
+        }
+
+        /* Mist & Ink Reveal Animations */
+        .mist-reveal {
+            animation: mistReveal 0.95s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            opacity: 0;
+        }
+        @keyframes mistReveal {
+            0% { opacity: 0; filter: blur(8px); transform: translateY(12px) scale(0.99); }
+            100% { opacity: 1; filter: blur(0px); transform: translateY(0) scale(1); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            opacity: 0;
+        }
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(15px); }
+            from { opacity: 0; transform: translateY(12px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Floating Stat Change Popup */
+        .stat-float {
+            position: absolute;
+            top: -4px;
+            right: -14px;
+            font-size: 11px;
+            font-weight: 700;
+            pointer-events: none;
+            animation: statFloatUp 1.4s ease-out forwards;
+        }
+        @keyframes statFloatUp {
+            0% { opacity: 0; transform: translateY(6px) scale(0.8); }
+            25% { opacity: 1; transform: translateY(-2px) scale(1.1); }
+            100% { opacity: 0; transform: translateY(-18px) scale(0.95); }
         }
 
         /* Scrollbar hiding */
         #scroll-area::-webkit-scrollbar { display: none; }
-        #scroll-area { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        /* Overlays for Star Map interactions */
+        #scroll-area { -ms-overflow-style: none; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+
+        /* Fullscreen Star-Gazing Overlays */
         .fullscreen-overlay {
-            position: fixed; inset: 0; z-index: 50; display: none;
-            justify-content: center; align-items: flex-end; padding-bottom: 12vh;
-            color: rgba(255, 255, 255, 0.7); font-size: 1.1rem; letter-spacing: 0.1em;
-            cursor: pointer; text-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
-            animation: pulseText 2s infinite ease-in-out;
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: calc(2.2rem + env(safe-area-inset-top, 0px)) 1.5rem calc(2.5rem + env(safe-area-inset-bottom, 0px));
+            cursor: pointer;
         }
-        @keyframes pulseText { 0%, 100% { opacity: 0.4; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-5px); } }
+
+        .gatha-whisper {
+            max-width: 90%;
+            text-align: center;
+            font-size: 0.9rem;
+            letter-spacing: 0.22em;
+            line-height: 1.9;
+            color: rgba(226, 232, 240, 0.85);
+            text-shadow: 0 0 14px rgba(34, 211, 238, 0.55), 0 2px 6px rgba(0, 0, 0, 0.95);
+            animation: gathaFade 1.2s ease-out forwards;
+        }
+        @keyframes gathaFade {
+            from { opacity: 0; filter: blur(6px); transform: translateY(-8px); }
+            to { opacity: 1; filter: blur(0); transform: translateY(0); }
+        }
+
+        .zen-prompt-pill {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            padding: 0.55rem 1.35rem;
+            border-radius: 9999px;
+            background: rgba(8, 12, 24, 0.55);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(var(--theme-rgb), 0.35);
+            color: rgba(241, 245, 249, 0.9);
+            font-size: 0.88rem;
+            letter-spacing: 0.2em;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.6), 0 0 15px rgba(var(--theme-rgb), 0.18);
+            animation: pulseText 2.6s infinite ease-in-out;
+        }
+        @keyframes pulseText {
+            0%, 100% { opacity: 0.55; transform: translateY(0); }
+            50% { opacity: 1; transform: translateY(-4px); }
+        }
     </style>
 </head>
 <body>
 
-    <!-- Star Map Canvas -->
+    <!-- Living Mandala & Constellation Canvas -->
     <canvas id="starmap"></canvas>
+    <div class="zen-vignette"></div>
 
-    <!-- Click Overlays -->
-    <div id="continue-overlay" class="fullscreen-overlay">點擊畫面繼續...</div>
-    <div id="return-overlay" class="fullscreen-overlay" style="z-index: 100;">點擊畫面返回...</div>
+    <!-- Star Transition Overlay (Between Realms) -->
+    <div id="continue-overlay" class="fullscreen-overlay">
+        <div class="flex flex-col items-center space-y-1.5 mt-1">
+            <span class="text-[10px] tracking-[0.35em] text-cyan-300/60 uppercase">金剛般若・星軌連珠</span>
+            <div id="overlay-gatha" class="gatha-whisper"></div>
+        </div>
+        <div class="zen-prompt-pill">
+            <span class="text-amber-300 text-xs">✦</span>
+            <span>輕觸星河・步入幻境</span>
+            <span class="text-amber-300 text-xs">✦</span>
+        </div>
+    </div>
 
-    <!-- Main UI Card -->
+    <!-- Ending Constellation Contemplation Overlay -->
+    <div id="return-overlay" class="fullscreen-overlay" style="z-index: 100;">
+        <div class="flex flex-col items-center text-center space-y-2 px-5 py-3 rounded-2xl bg-slate-950/50 backdrop-blur-md border border-white/10 shadow-2xl">
+            <div class="text-xs tracking-[0.35em] text-amber-300/80">《金剛般若・命運星辰圖》</div>
+            <div id="constellation-summary" class="text-xs sm:text-sm tracking-widest text-slate-200/90 font-light"></div>
+        </div>
+        <div class="zen-prompt-pill">
+            <span class="text-cyan-300 text-xs">❖</span>
+            <span>輕觸虛空・返回法界</span>
+            <span class="text-cyan-300 text-xs">❖</span>
+        </div>
+    </div>
+
+    <!-- Main UI Sutra Card -->
     <div id="main-card" class="glass-container flex flex-col">
-        <!-- Header -->
-        <header class="w-full px-6 py-4 flex justify-between items-center shrink-0 border-b border-white/10">
-            <div class="text-[12px] sm:text-sm tracking-widest flex gap-4 md:gap-8 opacity-90">
-                <span class="text-cyan-400">覺悟 <span id="stat-enl" class="font-bold">0</span></span>
-                <span class="text-yellow-400">福德 <span id="stat-mer" class="font-bold">0</span></span>
-                <span class="text-red-400">執著 <span id="stat-att" class="font-bold">0</span></span>
+        <!-- 4-Corner Classical Vajra Filigree -->
+        <svg class="card-ornament ornament-tl" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.2">
+            <path d="M2 22V6a4 4 0 0 1 4-4h16" />
+            <path d="M6 14V8a2 2 0 0 1 2-2h6" opacity="0.65"/>
+            <circle cx="6" cy="6" r="1.5" fill="currentColor"/>
+        </svg>
+        <svg class="card-ornament ornament-tr" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.2">
+            <path d="M2 22V6a4 4 0 0 1 4-4h16" />
+            <path d="M6 14V8a2 2 0 0 1 2-2h6" opacity="0.65"/>
+            <circle cx="6" cy="6" r="1.5" fill="currentColor"/>
+        </svg>
+        <svg class="card-ornament ornament-bl" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.2">
+            <path d="M2 22V6a4 4 0 0 1 4-4h16" />
+            <path d="M6 14V8a2 2 0 0 1 2-2h6" opacity="0.65"/>
+            <circle cx="6" cy="6" r="1.5" fill="currentColor"/>
+        </svg>
+        <svg class="card-ornament ornament-br" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.2">
+            <path d="M2 22V6a4 4 0 0 1 4-4h16" />
+            <path d="M6 14V8a2 2 0 0 1 2-2h6" opacity="0.65"/>
+            <circle cx="6" cy="6" r="1.5" fill="currentColor"/>
+        </svg>
+
+        <!-- Subtle Rotating Sacred Lotus-Dharma Watermark -->
+        <svg class="dharma-watermark" viewBox="0 0 200 200" fill="none" stroke="currentColor" stroke-width="0.8">
+            <circle cx="100" cy="100" r="92" stroke-dasharray="3 3" />
+            <circle cx="100" cy="100" r="76" />
+            <circle cx="100" cy="100" r="28" />
+            <polygon points="100,24 154,100 100,176 46,100" />
+            <polygon points="24,100 100,46 176,100 100,154" />
+            <rect x="46" y="46" width="108" height="108" transform="rotate(45 100 100)" />
+            <rect x="46" y="46" width="108" height="108" />
+        </svg>
+
+        <!-- Header HUD -->
+        <header class="relative z-10 w-full px-5 sm:px-7 pt-4 pb-3 flex justify-between items-center shrink-0 border-b border-white/10">
+            <div class="text-xs sm:text-sm tracking-wider flex items-center gap-3.5 sm:gap-6">
+                <!-- 覺悟 -->
+                <div id="wrap-enl" class="relative flex items-center gap-1.5 text-cyan-300">
+                    <svg class="w-3.5 h-3.5 opacity-85" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <path d="M12 3C9 8 6 11 6 14a6 6 0 0 0 12 0c0-3-3-6-6-11Z"/>
+                        <path d="M12 10v7" opacity="0.6"/>
+                    </svg>
+                    <span class="opacity-80">覺悟</span>
+                    <span id="stat-enl" class="font-semibold text-cyan-200">0</span>
+                </div>
+                <!-- 福德 -->
+                <div id="wrap-mer" class="relative flex items-center gap-1.5 text-amber-300">
+                    <svg class="w-3.5 h-3.5 opacity-85" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                    </svg>
+                    <span class="opacity-80">福德</span>
+                    <span id="stat-mer" class="font-semibold text-amber-200">0</span>
+                </div>
+                <!-- 執著 -->
+                <div id="wrap-att" class="relative flex items-center gap-1.5 text-rose-300">
+                    <svg class="w-3.5 h-3.5 opacity-85" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <path d="M12 2c.5 4-3 6-3 10a5 5 0 0 0 10 0c0-4.5-3.5-6.5-3-10-1.5 2-2.5 3-4 0Z"/>
+                    </svg>
+                    <span class="opacity-80">執著</span>
+                    <span id="stat-att" class="font-semibold text-rose-200">0</span>
+                </div>
             </div>
-            <div class="text-[11px] sm:text-xs tracking-widest text-gray-300 opacity-80 bg-white/10 px-3 py-1 rounded-full border border-white/20" id="stat-loop">
-                輪迴 0
+
+            <div class="flex items-center gap-2">
+                <!-- Zen Singing Bowl Audio Toggle -->
+                <button id="audio-btn" onclick="toggleAudio()" title="梵音頌缽開關" class="w-7 h-7 rounded-full flex items-center justify-center bg-white/5 hover:bg-white/15 border border-white/15 text-amber-200/80 transition-all">
+                    <svg id="audio-icon-on" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <path d="M4 11a8 8 0 0 0 16 0H4Z"/>
+                        <path d="M8 7c1.5-1.5 6.5-1.5 8 0"/>
+                        <path d="M12 3v2"/>
+                    </svg>
+                    <svg id="audio-icon-off" class="w-3.5 h-3.5 hidden opacity-50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <path d="M4 11a8 8 0 0 0 16 0H4Z"/>
+                        <line x1="3" y1="3" x2="21" y2="21"/>
+                    </svg>
+                </button>
+
+                <!-- Samsara Loop Badge -->
+                <div class="text-[11px] tracking-widest text-slate-200/90 bg-white/5 px-2.5 py-1 rounded-full border border-white/15 flex items-center gap-1" id="stat-loop">
+                    <span>輪迴 0</span>
+                </div>
             </div>
         </header>
 
-        <!-- Content Area -->
-        <main id="scroll-area" class="flex-1 overflow-y-auto p-6 md:p-10 pb-12 flex flex-col justify-between">
-            <div id="story-container" class="flex-1 flex flex-col justify-center space-y-6"></div>
-            <div id="choices-container" class="w-full flex flex-col space-y-3 mt-8 shrink-0 pb-12"></div>
+        <!-- 12-Bead Mala Progress Bar (8 Illusions + 4 Labyrinth Marks) -->
+        <div class="mala-bar relative z-10 w-full px-6 py-2 flex items-center justify-center gap-2 border-b border-white/5 bg-black/15 shrink-0">
+            <span class="text-[10px] tracking-[0.2em] text-slate-400/75 mr-1">幻境</span>
+            <div id="mala-encounters" class="flex items-center gap-1.5"></div>
+            <span class="text-white/20 text-[10px] mx-1">｜</span>
+            <span class="text-[10px] tracking-[0.2em] text-amber-300/70 mr-1">四相</span>
+            <div id="mala-labyrinth" class="flex items-center gap-2"></div>
+        </div>
+
+        <!-- Scrollable Content Area -->
+        <main id="scroll-area" class="relative z-10 flex-1 overflow-y-auto px-6 py-6 sm:px-10 sm:py-8 pb-12 flex flex-col justify-between">
+            <div id="story-container" class="flex-1 flex flex-col justify-center space-y-5"></div>
+            <div id="choices-container" class="w-full flex flex-col space-y-3 mt-7 shrink-0 pb-10"></div>
         </main>
     </div>
 
     <script>
         // ==========================================
-        // STAR MAP CANVAS SYSTEM
+        // ZEN SINGING BOWL & CHIME SYNTHESIZER (Web Audio API)
+        // ==========================================
+        const ZenAudio = {
+            ctx: null,
+            enabled: true,
+            init() {
+                if (!this.ctx) {
+                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                    if (AudioCtx) this.ctx = new AudioCtx();
+                }
+                if (this.ctx && this.ctx.state === 'suspended') {
+                    this.ctx.resume().catch(() => {});
+                }
+            },
+            playBowl(type = 'enl') {
+                if (!this.enabled) return;
+                try {
+                    this.init();
+                    if (!this.ctx) return;
+                    const now = this.ctx.currentTime;
+                    const freqMap = {
+                        enl: [264, 528, 727.5],      // 般若清音
+                        mer: [216, 432, 648],        // 慈悲暖音
+                        att: [174, 348, 480],        // 業力沉鐘
+                        special: [297, 594, 891],    // 金剛覺醒
+                        labyrinth: [144, 288, 576]   // 四相法鐘
+                    };
+                    const freqs = freqMap[type] || freqMap.enl;
+
+                    freqs.forEach((f, idx) => {
+                        const osc = this.ctx.createOscillator();
+                        const gain = this.ctx.createGain();
+                        osc.type = 'sine';
+                        // Subtle Tibetan singing bowl acoustic beating
+                        osc.frequency.setValueAtTime(f + (idx === 1 ? 1.8 : 0), now);
+
+                        const maxGain = idx === 0 ? 0.09 : (idx === 1 ? 0.05 : 0.022);
+                        const duration = idx === 0 ? 4.2 : 3.0;
+
+                        gain.gain.setValueAtTime(0.0001, now);
+                        gain.gain.exponentialRampToValueAtTime(maxGain, now + 0.06);
+                        gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+                        osc.connect(gain);
+                        gain.connect(this.ctx.destination);
+                        osc.start(now);
+                        osc.stop(now + duration + 0.05);
+                    });
+                } catch (e) { /* Ignore audio errors gracefully */ }
+            },
+            playChime() {
+                if (!this.enabled) return;
+                try {
+                    this.init();
+                    if (!this.ctx) return;
+                    const now = this.ctx.currentTime;
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(1056, now);
+                    gain.gain.setValueAtTime(0.0001, now);
+                    gain.gain.exponentialRampToValueAtTime(0.03, now + 0.015);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.1);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + 1.15);
+                } catch (e) {}
+            }
+        };
+
+        function toggleAudio() {
+            ZenAudio.enabled = !ZenAudio.enabled;
+            document.getElementById('audio-icon-on').classList.toggle('hidden', !ZenAudio.enabled);
+            document.getElementById('audio-icon-off').classList.toggle('hidden', ZenAudio.enabled);
+            if (ZenAudio.enabled) ZenAudio.playChime();
+        }
+
+        // ==========================================
+        // SUTRA GATHAS & AESTHETIC THEME ENGINE
+        // ==========================================
+        const SUTRA_GATHAS = [
+            "「凡所有相，皆是虛妄；若見諸相非相，即見如來。」",
+            "「應無所住，而生其心。」",
+            "「過去心不可得，現在心不可得，未來心不可得。」",
+            "「一切有為法，如夢幻泡影，如露亦如電，應作如是觀。」",
+            "「知我說法，如筏喻者；法尚應捨，何況非法。」",
+            "「無我相，無人相，無眾生相，無壽者相。」",
+            "「若以色見我，以音聲求我，是人行邪道，不能見如來。」",
+            "「如來者，無所從來，亦無所去，故名如來。」",
+            "「菩薩於法，應無所住，行於布施。」",
+            "「所謂佛法者，即非佛法。」",
+            "「不取於相，如如不動。」",
+            "「實無有法，如來得阿耨多羅三藐三菩提。」"
+        ];
+
+        const THEME_PALETTES = {
+            cyan:   { r: 34,  g: 211, b: 238, secR: 56,  secG: 189, secB: 248 }, // 般若空青
+            gold:   { r: 251, g: 191, b: 36,  secR: 245, secG: 158, secB: 11  }, // 金剛莊嚴金
+            purple: { r: 192, g: 132, b: 252, secR: 139, secG: 92,  secB: 246 }, // 夢幻泡影紫
+            red:    { r: 248, g: 113, b: 113, secR: 251, secG: 146, secB: 60  }, // 業火紅蓮
+            white:  { r: 226, g: 232, b: 240, secR: 165, secG: 243, secB: 252 }, // 摩尼淨白
+            void:   { r: 148, g: 163, b: 184, secR: 71,  secG: 85,  secB: 105 }  // 斷滅寂灰
+        };
+
+        let currentTheme = { ...THEME_PALETTES.cyan };
+        let targetTheme = { ...THEME_PALETTES.cyan };
+        let currentMotif = 'stardust'; // 'stardust' | 'bubble' | 'fire' | 'petal' | 'shard'
+        let starViewBoost = 0;         // 0 normal, 1 in transition/constellation contemplation
+        let targetStarViewBoost = 0;
+
+        function detectSceneAesthetics(nodeId, title, htmlText) {
+            // Color theme detection
+            let key = 'cyan';
+            if (nodeId === 'end_void') key = 'void';
+            else if (htmlText.includes('glow-gold')) key = 'gold';
+            else if (htmlText.includes('glow-red')) key = 'red';
+            else if (htmlText.includes('glow-purple')) key = 'purple';
+            else if (htmlText.includes('glow-white')) key = 'white';
+            else key = 'cyan';
+
+            targetTheme = { ...THEME_PALETTES[key] };
+            document.documentElement.style.setProperty(
+                '--theme-rgb',
+                `${targetTheme.r}, ${targetTheme.g}, ${targetTheme.b}`
+            );
+
+            // Particle motif detection from title & content
+            const t = (title || '') + htmlText;
+            if (/河|泡|蜃|露|筏|海|龜/.test(t)) {
+                currentMotif = 'bubble';
+            } else if (/火|燃|劫|暴君|餓獸|毒箭|魔王|電/.test(t)) {
+                currentMotif = 'fire';
+            } else if (/花|蓮|樹|聖果|寶|珍珠|座/.test(t)) {
+                currentMotif = 'petal';
+            } else if (/迷宮|鏡|相|刃/.test(t)) {
+                currentMotif = 'shard';
+            } else {
+                currentMotif = 'stardust';
+            }
+        }
+
+        // ==========================================
+        // LIVING MANDALA & STAR MAP CANVAS SYSTEM (60fps Retina)
         // ==========================================
         const canvas = document.getElementById('starmap');
         const ctx = canvas.getContext('2d');
-        let constellation = []; // stores {x, y, title}
-        
+        let viewW = window.innerWidth;
+        let viewH = window.innerHeight;
+        let constellation = []; // { x, y, title, color, revealProgress, burstDone, isMajor }
+        let pendingStarColor = { r: 34, g: 211, b: 238 };
+
         let bgStars = [];
+        let realmParticles = [];
+        let touchRipples = [];
+        let starBursts = [];
+        let shootingStar = null;
+        let parallax = { x: 0, y: 0, tx: 0, ty: 0 };
+
         function initBgStars() {
-            for(let i=0; i<100; i++){
+            bgStars = [];
+            for (let i = 0; i < 130; i++) {
                 bgStars.push({
                     x: Math.random(),
                     y: Math.random(),
-                    size: Math.random() * 1.5,
-                    alpha: Math.random() * 0.5 + 0.1
+                    size: Math.random() * 1.4 + 0.3,
+                    baseAlpha: Math.random() * 0.55 + 0.12,
+                    twinkleSpeed: Math.random() * 0.0025 + 0.0008,
+                    phase: Math.random() * Math.PI * 2,
+                    depth: Math.random() * 0.8 + 0.2
                 });
             }
+            realmParticles = [];
+            for (let i = 0; i < 48; i++) {
+                realmParticles.push(createRealmParticle(true));
+            }
         }
+
+        function createRealmParticle(randomY = false) {
+            return {
+                x: Math.random(),
+                y: randomY ? Math.random() : 1.06,
+                vx: (Math.random() - 0.5) * 0.00035,
+                vy: -(Math.random() * 0.00055 + 0.0002),
+                size: Math.random() * 3.5 + 1.5,
+                alpha: Math.random() * 0.45 + 0.12,
+                rot: Math.random() * Math.PI * 2,
+                rotSpeed: (Math.random() - 0.5) * 0.02,
+                swayPhase: Math.random() * Math.PI * 2
+            };
+        }
+
         initBgStars();
 
         function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            drawConstellation();
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            viewW = window.innerWidth;
+            viewH = window.innerHeight;
+            canvas.width = Math.floor(viewW * dpr);
+            canvas.height = Math.floor(viewH * dpr);
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         }
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        function addStar(title) {
+        // Pointer Parallax & Lotus Water Ripples on Tap/Click
+        window.addEventListener('pointermove', (e) => {
+            parallax.tx = (e.clientX / viewW - 0.5) * 22;
+            parallax.ty = (e.clientY / viewH - 0.5) * 22;
+        });
+
+        window.addEventListener('pointerdown', (e) => {
+            spawnLotusRipple(e.clientX, e.clientY, false);
+        });
+
+        function spawnLotusRipple(x, y, grand = false) {
+            touchRipples.push({
+                x, y,
+                r: 2,
+                maxR: grand ? 135 : 75,
+                alpha: grand ? 0.75 : 0.48,
+                color: { ...targetTheme }
+            });
+            if (grand) {
+                touchRipples.push({
+                    x, y,
+                    r: 12,
+                    maxR: 90,
+                    alpha: 0.55,
+                    color: { r: 252, g: 211, b: 77 }
+                });
+            }
+        }
+
+        function addStar(title, isMajor = false) {
             if (!title) return;
-            // Generate normalized coordinates (0.1 to 0.9 to keep away from edges)
-            const margin = 0.15;
+            const marginX = 0.15;
+            const marginY = 0.16;
             let x, y;
             let isValid = false;
             let attempts = 0;
-            
-            // 避免星星重疊的防撞機制（最多嘗試 50 次尋找空曠處）
-            while (!isValid && attempts < 50) {
-                x = margin + Math.random() * (1 - margin * 2);
-                y = margin + Math.random() * (1 - margin * 2);
+
+            // 排斥防撞機制：確保每顆星辰與既有星辰保持優雅間距
+            while (!isValid && attempts < 65) {
+                x = marginX + Math.random() * (1 - marginX * 2);
+                y = marginY + Math.random() * (1 - marginY * 2);
                 isValid = true;
-                
+
                 for (let star of constellation) {
                     const dx = star.x - x;
                     const dy = star.y - y;
-                    const dist = Math.sqrt(dx*dx + dy*dy);
-                    if (dist < 0.15) { // 如果兩顆星距離太近，則重新擲骰
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 0.155) {
                         isValid = false;
                         break;
                     }
@@ -211,126 +755,465 @@
             }
 
             const isFirst = constellation.length === 0;
-            
-            const newStar = { x, y, title, revealProgress: 0 };
+            const newStar = {
+                x,
+                y,
+                title,
+                color: isFirst ? { r: 226, g: 232, b: 240 } : { ...pendingStarColor },
+                revealProgress: isFirst ? 1 : 0,
+                burstDone: isFirst,
+                isMajor: isMajor || isFirst,
+                pulsePhase: Math.random() * Math.PI * 2
+            };
             constellation.push(newStar);
-            
-            // Animate drawing the new line and star
-            animateConstellation();
+
+            if (isFirst) {
+                spawnLotusRipple(x * viewW, y * viewH, true);
+            }
         }
 
         function clearStars() {
             constellation = [];
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            starBursts = [];
         }
 
-        let animFrame;
-        function animateConstellation() {
-            cancelAnimationFrame(animFrame);
-            
-            let progress = 0;
-            const speed = 0.015; // 放慢畫線速度，讓星辰連接的過程更明顯
-            
-            function step() {
-                progress += speed;
-                if (progress > 1) progress = 1;
-                
-                if (constellation.length > 0) {
-                    constellation[constellation.length - 1].revealProgress = progress;
-                }
-                
-                drawConstellation();
-                
-                if (progress < 1) {
-                    animFrame = requestAnimationFrame(step);
+        function triggerStarArrivalBurst(px, py, color) {
+            spawnLotusRipple(px, py, true);
+            for (let i = 0; i < 16; i++) {
+                const angle = (Math.PI * 2 * i) / 16 + Math.random() * 0.2;
+                const spd = Math.random() * 1.6 + 0.6;
+                starBursts.push({
+                    x: px,
+                    y: py,
+                    vx: Math.cos(angle) * spd,
+                    vy: Math.sin(angle) * spd,
+                    size: Math.random() * 2.2 + 1,
+                    alpha: 0.95,
+                    color
+                });
+            }
+        }
+
+        function drawStarFlare(x, y, radius, spikeLen, color, alpha) {
+            ctx.save();
+            ctx.translate(x, y);
+
+            // Radial Aura
+            const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, radius * 3.8);
+            grad.addColorStop(0, `rgba(255, 255, 255, ${alpha})`);
+            grad.addColorStop(0.28, `rgba(${color.r}, ${color.g}, ${color.b}, ${alpha * 0.65})`);
+            grad.addColorStop(1, `rgba(${color.r}, ${color.g}, ${color.b}, 0)`);
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(0, 0, radius * 3.8, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 4-Pointed Vajra Star Spikes
+            ctx.strokeStyle = `rgba(255, 255, 255, ${alpha * 0.85})`;
+            ctx.lineWidth = 1.1;
+            ctx.beginPath();
+            ctx.moveTo(-spikeLen, 0);
+            ctx.lineTo(spikeLen, 0);
+            ctx.moveTo(0, -spikeLen);
+            ctx.lineTo(0, spikeLen);
+            ctx.stroke();
+
+            // Core Pearl
+            ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+            ctx.beginPath();
+            ctx.arc(0, 0, radius * 0.68, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        function drawSacredMandala(time) {
+            const cx = viewW * 0.5 + parallax.x * 0.35;
+            const cy = viewH * 0.5 + parallax.y * 0.35;
+            const baseR = Math.min(viewW, viewH) * 0.36;
+            const alpha = 0.055 + starViewBoost * 0.085;
+            const c = currentTheme;
+
+            ctx.save();
+            ctx.translate(cx, cy);
+
+            // Outer 32-Division Ring (呼應金剛經三十二品)
+            ctx.strokeStyle = `rgba(${c.r}, ${c.g}, ${c.b}, ${alpha})`;
+            ctx.lineWidth = 0.8;
+            ctx.beginPath();
+            ctx.arc(0, 0, baseR * 1.08, 0, Math.PI * 2);
+            ctx.stroke();
+
+            for (let i = 0; i < 32; i++) {
+                const ang = (i * Math.PI * 2) / 32 + time * 0.00004;
+                const r1 = baseR * 1.05;
+                const r2 = baseR * 1.11;
+                ctx.beginPath();
+                ctx.moveTo(Math.cos(ang) * r1, Math.sin(ang) * r1);
+                ctx.lineTo(Math.cos(ang) * r2, Math.sin(ang) * r2);
+                ctx.stroke();
+            }
+
+            // Rotating Vajra Octagram (金剛界幾何)
+            ctx.save();
+            ctx.rotate(time * 0.00006);
+            ctx.strokeStyle = `rgba(252, 211, 77, ${alpha * 0.85})`;
+            ctx.lineWidth = 0.75;
+            const sq = baseR * 0.72;
+            ctx.strokeRect(-sq, -sq, sq * 2, sq * 2);
+            ctx.rotate(Math.PI / 4);
+            ctx.strokeRect(-sq, -sq, sq * 2, sq * 2);
+            ctx.restore();
+
+            // Counter-Rotating 12-Petal Lotus (十二葉般若蓮華)
+            ctx.save();
+            ctx.rotate(-time * 0.00008);
+            const breathe = 1 + Math.sin(time * 0.0012) * 0.03;
+            ctx.scale(breathe, breathe);
+            ctx.strokeStyle = `rgba(${c.r}, ${c.g}, ${c.b}, ${alpha * 1.15})`;
+            ctx.lineWidth = 0.9;
+            for (let i = 0; i < 12; i++) {
+                ctx.rotate((Math.PI * 2) / 12);
+                ctx.beginPath();
+                ctx.moveTo(0, baseR * 0.22);
+                ctx.quadraticCurveTo(baseR * 0.24, baseR * 0.56, 0, baseR * 0.86);
+                ctx.quadraticCurveTo(-baseR * 0.24, baseR * 0.56, 0, baseR * 0.22);
+                ctx.stroke();
+            }
+            ctx.restore();
+
+            // Inner Seed Circle
+            ctx.strokeStyle = `rgba(255, 255, 255, ${alpha * 0.9})`;
+            ctx.beginPath();
+            ctx.arc(0, 0, baseR * 0.22, 0, Math.PI * 2);
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+        function drawNebulaAndStars(time) {
+            const c = currentTheme;
+            // Breathing Cosmic Nebula Aura
+            const n1x = viewW * (0.32 + Math.sin(time * 0.0002) * 0.08) - parallax.x * 0.4;
+            const n1y = viewH * (0.35 + Math.cos(time * 0.00018) * 0.06) - parallax.y * 0.4;
+            const rad1 = Math.max(viewW, viewH) * 0.55;
+            const g1 = ctx.createRadialGradient(n1x, n1y, 0, n1x, n1y, rad1);
+            g1.addColorStop(0, `rgba(${c.r}, ${c.g}, ${c.b}, ${0.075 + starViewBoost * 0.05})`);
+            g1.addColorStop(0.55, `rgba(${c.secR}, ${c.secG}, ${c.secB}, 0.03)`);
+            g1.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            ctx.fillStyle = g1;
+            ctx.fillRect(0, 0, viewW, viewH);
+
+            // Background Twinkling Stars
+            for (let s of bgStars) {
+                const twinkle = 0.55 + 0.45 * Math.sin(time * s.twinkleSpeed + s.phase);
+                const sx = (s.x * viewW - parallax.x * s.depth + viewW) % viewW;
+                const sy = (s.y * viewH - parallax.y * s.depth + viewH) % viewH;
+                ctx.fillStyle = `rgba(226, 240, 255, ${s.baseAlpha * twinkle})`;
+                ctx.beginPath();
+                ctx.arc(sx, sy, s.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Occasional Shooting Star (「如露亦如電」)
+            if (!shootingStar && Math.random() < 0.0035) {
+                shootingStar = {
+                    x: Math.random() * viewW * 0.8 + viewW * 0.1,
+                    y: Math.random() * viewH * 0.35,
+                    vx: (Math.random() > 0.5 ? 1 : -1) * (4.5 + Math.random() * 3),
+                    vy: 2.2 + Math.random() * 2,
+                    life: 1.0
+                };
+            }
+            if (shootingStar) {
+                shootingStar.x += shootingStar.vx;
+                shootingStar.y += shootingStar.vy;
+                shootingStar.life -= 0.022;
+                if (shootingStar.life <= 0) {
+                    shootingStar = null;
+                } else {
+                    const tailX = shootingStar.x - shootingStar.vx * 14;
+                    const tailY = shootingStar.y - shootingStar.vy * 14;
+                    const sg = ctx.createLinearGradient(shootingStar.x, shootingStar.y, tailX, tailY);
+                    sg.addColorStop(0, `rgba(255, 255, 255, ${shootingStar.life * 0.85})`);
+                    sg.addColorStop(1, 'rgba(255, 255, 255, 0)');
+                    ctx.strokeStyle = sg;
+                    ctx.lineWidth = 1.3;
+                    ctx.beginPath();
+                    ctx.moveTo(shootingStar.x, shootingStar.y);
+                    ctx.lineTo(tailX, tailY);
+                    ctx.stroke();
                 }
             }
-            step();
         }
 
-        function drawConstellation() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Draw background decorative static stars
-            drawBackgroundStars();
+        function drawRealmParticles(time) {
+            const c = currentTheme;
+            for (let i = 0; i < realmParticles.length; i++) {
+                let p = realmParticles[i];
+                p.y += p.vy;
+                p.x += p.vx + Math.sin(time * 0.001 + p.swayPhase) * 0.00025;
+                p.rot += p.rotSpeed;
 
+                if (p.y < -0.05 || p.x < -0.05 || p.x > 1.05) {
+                    realmParticles[i] = createRealmParticle(false);
+                    continue;
+                }
+
+                const px = p.x * viewW;
+                const py = p.y * viewH;
+                const a = p.alpha * (0.7 + starViewBoost * 0.3);
+
+                ctx.save();
+                ctx.translate(px, py);
+                ctx.rotate(p.rot);
+
+                if (currentMotif === 'bubble') {
+                    // 夢幻泡影：透明微光水泡
+                    ctx.strokeStyle = `rgba(${c.r}, ${c.g}, ${c.b}, ${a * 0.85})`;
+                    ctx.lineWidth = 0.9;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, p.size * 1.4, 0, Math.PI * 2);
+                    ctx.stroke();
+                    ctx.fillStyle = `rgba(255, 255, 255, ${a * 0.4})`;
+                    ctx.beginPath();
+                    ctx.arc(-p.size * 0.45, -p.size * 0.45, p.size * 0.3, 0, Math.PI * 2);
+                    ctx.fill();
+                } else if (currentMotif === 'fire') {
+                    // 紅蓮業火：上升星火金燼
+                    const fg = ctx.createRadialGradient(0, 0, 0, 0, 0, p.size * 1.6);
+                    fg.addColorStop(0, `rgba(254, 240, 138, ${a})`);
+                    fg.addColorStop(0.5, `rgba(248, 113, 113, ${a * 0.65})`);
+                    fg.addColorStop(1, 'rgba(248, 113, 113, 0)');
+                    ctx.fillStyle = fg;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, p.size * 1.6, 0, Math.PI * 2);
+                    ctx.fill();
+                } else if (currentMotif === 'petal') {
+                    // 虛空蓮瓣：飄舞微光花瓣
+                    ctx.fillStyle = `rgba(${c.r}, ${c.g}, ${c.b}, ${a * 0.6})`;
+                    ctx.beginPath();
+                    ctx.moveTo(0, -p.size * 1.3);
+                    ctx.quadraticCurveTo(p.size, 0, 0, p.size * 1.3);
+                    ctx.quadraticCurveTo(-p.size, 0, 0, -p.size * 1.3);
+                    ctx.fill();
+                } else if (currentMotif === 'shard') {
+                    // 諸相非相：琉璃金剛鏡片
+                    ctx.strokeStyle = `rgba(${c.r}, ${c.g}, ${c.b}, ${a * 0.8})`;
+                    ctx.lineWidth = 0.85;
+                    ctx.beginPath();
+                    ctx.moveTo(0, -p.size * 1.4);
+                    ctx.lineTo(p.size * 0.9, 0);
+                    ctx.lineTo(0, p.size * 1.4);
+                    ctx.lineTo(-p.size * 0.9, 0);
+                    ctx.closePath();
+                    ctx.stroke();
+                } else {
+                    // 般若微塵
+                    ctx.fillStyle = `rgba(${c.r}, ${c.g}, ${c.b}, ${a * 0.65})`;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, p.size * 0.65, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                ctx.restore();
+            }
+        }
+
+        function drawConstellationLayer(time) {
             if (constellation.length === 0) return;
 
-            const w = canvas.width;
-            const h = canvas.height;
+            const pxOffset = parallax.x * 0.65;
+            const pyOffset = parallax.y * 0.65;
 
-            // Draw Lines
-            ctx.lineWidth = 1.5;
-            ctx.strokeStyle = 'rgba(100, 200, 255, 0.4)';
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = 'rgba(34, 211, 238, 0.8)';
-            ctx.beginPath();
-            
-            for (let i = 0; i < constellation.length; i++) {
-                const p = constellation[i];
-                const px = p.x * w;
-                const py = p.y * h;
-                
-                if (i === 0) {
-                    ctx.moveTo(px, py);
-                } else {
-                    const prev = constellation[i-1];
-                    const prevX = prev.x * w;
-                    const prevY = prev.y * h;
-                    
-                    if (i === constellation.length - 1) {
-                        // Animate the last line
-                        const currentX = prevX + (px - prevX) * p.revealProgress;
-                        const currentY = prevY + (py - prevY) * p.revealProgress;
-                        ctx.lineTo(currentX, currentY);
+            // Advance reveal progress on newest star
+            const lastStar = constellation[constellation.length - 1];
+            if (lastStar.revealProgress < 1) {
+                lastStar.revealProgress = Math.min(1, lastStar.revealProgress + 0.014);
+                if (lastStar.revealProgress >= 1 && !lastStar.burstDone) {
+                    lastStar.burstDone = true;
+                    triggerStarArrivalBurst(
+                        lastStar.x * viewW + pxOffset,
+                        lastStar.y * viewH + pyOffset,
+                        lastStar.color
+                    );
+                }
+            }
+
+            // 1. Draw Luminous Karmic Silk Threads (星軌連線)
+            if (constellation.length > 1) {
+                for (let i = 1; i < constellation.length; i++) {
+                    const prev = constellation[i - 1];
+                    const curr = constellation[i];
+                    const x1 = prev.x * viewW + pxOffset;
+                    const y1 = prev.y * viewH + pyOffset;
+                    const x2 = curr.x * viewW + pxOffset;
+                    const y2 = curr.y * viewH + pyOffset;
+
+                    const prog = i === constellation.length - 1 ? curr.revealProgress : 1;
+                    const ex = x1 + (x2 - x1) * prog;
+                    const ey = y1 + (y2 - y1) * prog;
+
+                    // Outer soft glow line
+                    const lineGrad = ctx.createLinearGradient(x1, y1, x2, y2);
+                    lineGrad.addColorStop(0, `rgba(${prev.color.r}, ${prev.color.g}, ${prev.color.b}, ${0.35 + starViewBoost * 0.35})`);
+                    lineGrad.addColorStop(1, `rgba(${curr.color.r}, ${curr.color.g}, ${curr.color.b}, ${0.55 + starViewBoost * 0.35})`);
+
+                    ctx.save();
+                    ctx.strokeStyle = lineGrad;
+                    ctx.lineWidth = 1.8 + starViewBoost * 0.8;
+                    ctx.shadowBlur = 12;
+                    ctx.shadowColor = `rgba(${curr.color.r}, ${curr.color.g}, ${curr.color.b}, 0.75)`;
+                    ctx.beginPath();
+                    ctx.moveTo(x1, y1);
+                    ctx.lineTo(ex, ey);
+                    ctx.stroke();
+
+                    // Inner crisp silver-gold filament
+                    ctx.strokeStyle = `rgba(255, 255, 255, ${0.28 + starViewBoost * 0.32})`;
+                    ctx.lineWidth = 0.7;
+                    ctx.beginPath();
+                    ctx.moveTo(x1, y1);
+                    ctx.lineTo(ex, ey);
+                    ctx.stroke();
+                    ctx.restore();
+
+                    // Leading Comet Head when drawing newest line
+                    if (prog < 1) {
+                        drawStarFlare(ex, ey, 3.8, 12, curr.color, 0.95);
                     } else {
-                        ctx.lineTo(px, py);
+                        // Flowing Prana Light Bead gliding along completed links
+                        const flowT = ((time * 0.00038 + i * 0.27) % 1);
+                        const bx = x1 + (x2 - x1) * flowT;
+                        const by = y1 + (y2 - y1) * flowT;
+                        ctx.fillStyle = `rgba(255, 255, 255, ${0.45 + starViewBoost * 0.4})`;
+                        ctx.beginPath();
+                        ctx.arc(bx, by, 1.8, 0, Math.PI * 2);
+                        ctx.fill();
                     }
                 }
             }
-            ctx.stroke();
 
-            // Draw Stars and Titles
+            // 2. Draw Each Star & Sacred Label
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            
+
             for (let i = 0; i < constellation.length; i++) {
                 const p = constellation[i];
-                const px = p.x * w;
-                const py = p.y * h;
-                const alpha = (i === constellation.length - 1) ? p.revealProgress : 1;
+                const px = p.x * viewW + pxOffset;
+                const py = p.y * viewH + pyOffset;
+                const alpha = (i === constellation.length - 1)
+                    ? Math.max(0, (p.revealProgress - 0.65) / 0.35)
+                    : 1;
 
-                // Draw Dot
+                if (alpha <= 0.01) continue;
+
+                const pulse = 1 + Math.sin(time * 0.003 + p.pulsePhase) * 0.16;
+                const baseRadius = (p.isMajor ? 4.8 : 3.6) * pulse;
+                const spikeLen = (p.isMajor ? 15 : 10) * (0.85 + starViewBoost * 0.35);
+
+                // Sacred Diamond Halo for Major Nodes (起點 / 四相 / 結局) or Latest Star
+                if (p.isMajor || i === constellation.length - 1) {
+                    ctx.save();
+                    ctx.translate(px, py);
+                    ctx.rotate(time * 0.0008 + i);
+                    const dSize = (p.isMajor ? 11 : 9) * pulse;
+                    ctx.strokeStyle = `rgba(${p.color.r}, ${p.color.g}, ${p.color.b}, ${alpha * (0.45 + starViewBoost * 0.35)})`;
+                    ctx.lineWidth = 0.9;
+                    ctx.strokeRect(-dSize / 2, -dSize / 2, dSize, dSize);
+                    ctx.restore();
+                }
+
+                // Star Flare & Aura
+                drawStarFlare(px, py, baseRadius, spikeLen, p.color, alpha * (0.78 + starViewBoost * 0.22));
+
+                // Calligraphic Star Name Label
+                const labelY = p.y < 0.22 ? py + 24 : py - 24;
+                const labelText = p.title;
+                ctx.save();
+                ctx.font = `${p.isMajor ? '600' : '400'} 13px "Noto Serif TC", serif`;
+                const textWidth = ctx.measureText(labelText).width;
+
+                // Subtle translucent pill halo behind text for clarity
+                const padX = 8;
+                const pillW = textWidth + padX * 2;
+                const pillH = 20;
+                ctx.fillStyle = `rgba(4, 7, 15, ${alpha * (0.45 + starViewBoost * 0.35)})`;
                 ctx.beginPath();
-                ctx.arc(px, py, 4, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+                if (ctx.roundRect) {
+                    ctx.roundRect(px - pillW / 2, labelY - pillH / 2, pillW, pillH, 10);
+                } else {
+                    ctx.rect(px - pillW / 2, labelY - pillH / 2, pillW, pillH);
+                }
                 ctx.fill();
 
-                // Draw Glow
-                ctx.beginPath();
-                ctx.arc(px, py, 12, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(34, 211, 238, ${alpha * 0.3})`;
-                ctx.fill();
-
-                // Draw Text
-                ctx.font = '14px "Noto Serif TC", serif';
-                ctx.shadowBlur = 5;
-                ctx.shadowColor = 'black';
-                ctx.fillStyle = `rgba(200, 230, 255, ${alpha * 0.9})`;
-                ctx.fillText(p.title, px, py - 20);
+                ctx.shadowBlur = 8;
+                ctx.shadowColor = `rgba(${p.color.r}, ${p.color.g}, ${p.color.b}, ${alpha * 0.8})`;
+                ctx.fillStyle = `rgba(241, 245, 249, ${alpha * (0.82 + starViewBoost * 0.18)})`;
+                ctx.fillText(labelText, px, labelY);
+                ctx.restore();
             }
-            ctx.shadowBlur = 0; // reset
         }
 
-        function drawBackgroundStars() {
-            ctx.fillStyle = '#fff';
-            for(let s of bgStars) {
-                ctx.globalAlpha = s.alpha;
+        function drawRipplesAndBursts() {
+            // Star arrival burst sparks
+            for (let i = starBursts.length - 1; i >= 0; i--) {
+                const b = starBursts[i];
+                b.x += b.vx;
+                b.y += b.vy;
+                b.vx *= 0.96;
+                b.vy *= 0.96;
+                b.alpha -= 0.02;
+                if (b.alpha <= 0) {
+                    starBursts.splice(i, 1);
+                    continue;
+                }
+                ctx.fillStyle = `rgba(${b.color.r}, ${b.color.g}, ${b.color.b}, ${b.alpha})`;
                 ctx.beginPath();
-                ctx.arc(s.x * canvas.width, s.y * canvas.height, s.size, 0, Math.PI*2);
+                ctx.arc(b.x, b.y, b.size, 0, Math.PI * 2);
                 ctx.fill();
             }
-            ctx.globalAlpha = 1.0;
+
+            // Touch & Star Lotus Ripples
+            for (let i = touchRipples.length - 1; i >= 0; i--) {
+                const rp = touchRipples[i];
+                rp.r += (rp.maxR - rp.r) * 0.055 + 0.6;
+                rp.alpha *= 0.955;
+                if (rp.alpha < 0.015 || rp.r >= rp.maxR) {
+                    touchRipples.splice(i, 1);
+                    continue;
+                }
+                ctx.strokeStyle = `rgba(${rp.color.r}, ${rp.color.g}, ${rp.color.b}, ${rp.alpha})`;
+                ctx.lineWidth = 1.2;
+                ctx.beginPath();
+                ctx.arc(rp.x, rp.y, rp.r, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+        }
+
+        function masterAnimateLoop(time) {
+            // Smoothly interpolate theme colors & boost
+            const lerp = 0.035;
+            currentTheme.r += (targetTheme.r - currentTheme.r) * lerp;
+            currentTheme.g += (targetTheme.g - currentTheme.g) * lerp;
+            currentTheme.b += (targetTheme.b - currentTheme.b) * lerp;
+            currentTheme.secR += (targetTheme.secR - currentTheme.secR) * lerp;
+            currentTheme.secG += (targetTheme.secG - currentTheme.secG) * lerp;
+            currentTheme.secB += (targetTheme.secB - currentTheme.secB) * lerp;
+
+            starViewBoost += (targetStarViewBoost - starViewBoost) * 0.06;
+            parallax.x += (parallax.tx - parallax.x) * 0.05;
+            parallax.y += (parallax.ty - parallax.y) * 0.05;
+
+            ctx.clearRect(0, 0, viewW, viewH);
+
+            drawNebulaAndStars(time);
+            drawSacredMandala(time);
+            drawRealmParticles(time);
+            drawConstellationLayer(time);
+            drawRipplesAndBursts();
+
+            requestAnimationFrame(masterAnimateLoop);
         }
 
         // ==========================================
@@ -342,6 +1225,8 @@
             hiddenScore: 0,
             pool: []
         };
+        let isTransitioning = false;
+        let currentNodeKey = 'start';
 
         const ENCOUNTERS_PER_RUN = 8;
 
@@ -598,42 +1483,99 @@
             ]}
         };
 
-        // --- Core Engine Logic ---
-        function updateUI() {
+        // --- UI & Mala Progress Helpers ---
+        function showStatDelta(wrapperId, delta, colorClass) {
+            if (!delta || delta <= 0) return;
+            const wrap = document.getElementById(wrapperId);
+            if (!wrap) return;
+            const badge = document.createElement('span');
+            badge.className = `stat-float ${colorClass}`;
+            badge.innerText = `+${delta}`;
+            wrap.appendChild(badge);
+            setTimeout(() => badge.remove(), 1450);
+        }
+
+        function updateMalaProgress(nodeId) {
+            const encWrap = document.getElementById('mala-encounters');
+            const labWrap = document.getElementById('mala-labyrinth');
+            if (!encWrap || !labWrap) return;
+
+            encWrap.innerHTML = '';
+            labWrap.innerHTML = '';
+
+            const isLab = nodeId.startsWith('labyrinth_');
+            const isEnd = nodeId.startsWith('end_');
+            const labIndex = isLab ? parseInt(nodeId.split('_')[1], 10) : (isEnd ? 5 : 0);
+
+            for (let i = 1; i <= ENCOUNTERS_PER_RUN; i++) {
+                const bead = document.createElement('div');
+                let cls = 'mala-bead';
+                if (isLab || isEnd || i < state.encounterCount) cls += ' passed';
+                else if (nodeId.startsWith('enc_') && i === state.encounterCount) cls += ' current';
+                bead.className = cls;
+                encWrap.appendChild(bead);
+            }
+
+            for (let j = 1; j <= 4; j++) {
+                const d = document.createElement('div');
+                let cls = 'mala-diamond';
+                if (j < labIndex) cls += ' passed';
+                else if (j === labIndex) cls += ' current';
+                d.className = cls;
+                labWrap.appendChild(d);
+            }
+        }
+
+        function updateUI(prevStats = null) {
             document.getElementById('stat-enl').innerText = state.enl;
             document.getElementById('stat-mer').innerText = state.mer;
             document.getElementById('stat-att').innerText = state.att;
-            document.getElementById('stat-loop').innerText = `輪迴 ${state.loop}`;
+            document.getElementById('stat-loop').innerHTML = `<span>輪迴 ${state.loop}</span>`;
+
+            if (prevStats && prevStats.loop === state.loop) {
+                showStatDelta('wrap-enl', state.enl - prevStats.enl, 'text-cyan-300');
+                showStatDelta('wrap-mer', state.mer - prevStats.mer, 'text-amber-300');
+                showStatDelta('wrap-att', state.att - prevStats.att, 'text-rose-300');
+            }
         }
 
         function reincarnate() {
             state.loop += 1;
             state.enl = 0; state.mer = 0; state.att = 0;
             document.getElementById('main-card').classList.remove('ending-mode');
+            targetStarViewBoost = 0;
             clearStars();
             initRun();
         }
 
-        function toggleStarMap() {
+        function toggleStarMap(endingTitle = '') {
             const mainCard = document.getElementById('main-card');
             const overlay = document.getElementById('return-overlay');
-            
-            // Fade out the main UI
+            const summary = document.getElementById('constellation-summary');
+
+            ZenAudio.playChime();
+            targetStarViewBoost = 1;
+
+            summary.innerHTML = `第 <span class="text-purple-300 font-medium">${state.loop}</span> 世輪迴 ｜ 證境：<span class="text-amber-200 font-medium">${endingTitle || '圓滿'}</span> ｜ 覺悟 ${state.enl} · 福德 ${state.mer} · 執著 ${state.att}`;
+
             mainCard.style.opacity = '0';
+            mainCard.style.transform = 'scale(0.97)';
             mainCard.style.pointerEvents = 'none';
             overlay.style.display = 'flex';
-            
-            // Restore UI on click
+
             overlay.onclick = () => {
+                ZenAudio.playChime();
+                targetStarViewBoost = 0.35;
                 mainCard.style.opacity = '1';
+                mainCard.style.transform = 'scale(1)';
                 mainCard.style.pointerEvents = 'auto';
                 overlay.style.display = 'none';
-                
-                // Reset inline styles after transition (match the CSS transition time)
+
                 setTimeout(() => {
                     mainCard.style.opacity = '';
+                    mainCard.style.transform = '';
                     mainCard.style.pointerEvents = '';
-                }, 1500);
+                }, 950);
             };
         }
 
@@ -657,12 +1599,52 @@
             return arrCopy;
         }
 
-        // 將 renderNode 改為非同步(async)函式，以支援等待動畫完成
-        async function renderNode(nodeId) {
-            if (!nodeId) return; // 防呆：處理不需要載入新節點的情況（如點擊星辰圖按鈕）
+        function formatStoryHtml(rawHtml, nodeId) {
+            // 將開頭的【...】標題優雅地提煉為禪意章節橫幅
+            const headerRegex = /^<span class=['"]([^'"]+)['"]>【(.*?)】<\/span>(?:<br\s*\/?>)*/i;
+            const match = rawHtml.match(headerRegex);
 
+            let stageSubtitle = '';
+            if (nodeId.startsWith('enc_')) {
+                stageSubtitle = `星辰幻境 ・ 第 ${state.encounterCount} 境`;
+            } else if (nodeId.startsWith('labyrinth_')) {
+                stageSubtitle = `金剛般若 ・ 四相試煉`;
+            } else if (nodeId.startsWith('end_')) {
+                stageSubtitle = `因果圓成 ・ 命運終境`;
+            }
+
+            if (match) {
+                const spanClass = match[1];
+                const titleInside = match[2];
+                const bodyHtml = rawHtml.replace(headerRegex, '');
+                return `
+                    <div class="realm-header">
+                        ${stageSubtitle ? `<span class="text-[11px] tracking-[0.32em] text-slate-400/80 mb-1.5">${stageSubtitle}</span>` : ''}
+                        <div class="${spanClass} tracking-[0.18em]">【${titleInside}】</div>
+                    </div>
+                    <div class="leading-loose tracking-wider text-slate-200/95 font-light">${bodyHtml}</div>
+                `;
+            }
+
+            return `
+                <div class="realm-header">
+                    <span class="text-[11px] tracking-[0.35em] text-cyan-300/75 mb-1">金剛般若波羅蜜</span>
+                    <div class="glow-white text-lg tracking-[0.25em]">【虛空初醒】</div>
+                </div>
+                <div class="leading-loose tracking-wider text-slate-200/95 font-light">${rawHtml}</div>
+            `;
+        }
+
+        // 非同步場景渲染與星辰觀想轉場
+        async function renderNode(nodeId) {
+            if (!nodeId) {
+                isTransitioning = false;
+                return;
+            }
+
+            isTransitioning = true;
             let node;
-            
+
             if (nodeId === 'next_random') {
                 nodeId = getNextNode();
             }
@@ -673,63 +1655,78 @@
             } else {
                 node = fixedNodes[nodeId];
             }
-            
+
             if (node.route) {
-                renderNode(node.route(state));
+                await renderNode(node.route(state));
                 return;
             }
+
+            currentNodeKey = nodeId;
+            const rawHtml = typeof node.text === 'function' ? node.text(state) : node.text;
+            detectSceneAesthetics(nodeId, node.title, rawHtml);
+            updateMalaProgress(nodeId);
 
             const storyContainer = document.getElementById('story-container');
             const choicesContainer = document.getElementById('choices-container');
             const mainCard = document.getElementById('main-card');
 
-            // 1. 先清空目前的文字與按鈕
+            // 1. 清空當前文字與選項
             storyContainer.innerHTML = '';
             choicesContainer.innerHTML = '';
 
-            // 2. 讓 UI 變透明，進入欣賞星辰的轉場模式
+            // 2. 進入透明觀星轉場模式
             if (!nodeId.startsWith('end_')) {
                 mainCard.classList.add('transition-mode');
             }
+            targetStarViewBoost = 1;
 
-            // 3. 畫上新的星星，並等待玩家點擊後再繼續
+            // 3. 繪製新星辰與流光連線，展示金剛經禪偈並等待玩家輕觸繼續
+            const isMajorStar = !nodeId.startsWith('enc_');
             if (node.title) {
                 const isFirst = constellation.length === 0;
-                addStar(node.title);
-                
+                addStar(node.title, isMajorStar);
+
                 if (!isFirst) {
+                    const gathaEl = document.getElementById('overlay-gatha');
+                    gathaEl.innerText = SUTRA_GATHAS[Math.floor(Math.random() * SUTRA_GATHAS.length)];
+
                     await new Promise(resolve => {
-                        // 稍微延遲讓星星連線動畫開始後，才顯示「點擊繼續」提示
                         setTimeout(() => {
                             const overlay = document.getElementById('continue-overlay');
                             overlay.style.display = 'flex';
                             overlay.onclick = () => {
+                                ZenAudio.playChime();
                                 overlay.style.display = 'none';
                                 resolve();
                             };
-                        }, 600); 
+                        }, 650);
                     });
                 } else {
-                    // 第一次打開遊戲的第一顆星不阻擋，自動播放過渡
-                    await new Promise(resolve => setTimeout(resolve, 800));
+                    await new Promise(resolve => setTimeout(resolve, 680));
                 }
             }
 
-            // 4. 動畫結束，恢復 UI 毛玻璃背景
+            // 4. 恢復琉璃經閣介面
             mainCard.classList.remove('transition-mode');
 
-            // 檢查是否為結局，若為結局則保持背景透明
             if (nodeId.startsWith('end_')) {
                 mainCard.classList.add('ending-mode');
+                targetStarViewBoost = 0.45;
+                ZenAudio.playBowl('labyrinth');
+            } else {
+                targetStarViewBoost = 0;
+                if (nodeId.startsWith('labyrinth_')) {
+                    ZenAudio.playBowl('labyrinth');
+                }
             }
 
-            // Render Text
+            // 5. 渲染水墨霧化漸顯內文
             const textEl = document.createElement('div');
-            textEl.className = 'text-base md:text-lg leading-loose tracking-wide fade-in font-light text-gray-200';
-            textEl.innerHTML = typeof node.text === 'function' ? node.text(state) : node.text;
+            textEl.className = 'text-base sm:text-lg mist-reveal';
+            textEl.innerHTML = formatStoryHtml(rawHtml, nodeId);
             storyContainer.appendChild(textEl);
 
-            // Render Choices
+            // 6. 渲染黑曜玉簡選項
             if (node.choices) {
                 let availableChoices = node.choices.filter(c => {
                     if (c.cond && !c.cond(state)) return false;
@@ -737,17 +1734,15 @@
                     return true;
                 });
 
-                // 若為結局，動態加入「查看命運星辰圖」選項
                 if (nodeId.startsWith('end_')) {
                     availableChoices.push({
                         text: "【觀想】查看命運星辰圖",
-                        action: () => { toggleStarMap(); return null; }
+                        action: () => { toggleStarMap(node.title); return null; }
                     });
                 }
 
                 availableChoices = shuffleArray(availableChoices);
-                
-                // 如果有查看星辰圖的選項，確保它被排在最前面
+
                 if (nodeId.startsWith('end_')) {
                     const mapBtnIndex = availableChoices.findIndex(c => c.text.includes("查看命運星辰圖"));
                     if (mapBtnIndex > -1) {
@@ -758,32 +1753,68 @@
 
                 availableChoices.forEach((choice, index) => {
                     const btn = document.createElement('button');
-                    btn.className = 'glass-btn w-full p-4 rounded-xl text-gray-300 tracking-wider text-sm md:text-base text-left flex justify-between items-center group fade-in';
-                    btn.style.animationDelay = `${0.1 + index * 0.1}s`;
-                    
-                    const isHidden = choice.text.includes('【隱藏】') || choice.text.includes('【覺醒】') || choice.text.includes('【金剛】');
+                    const isSpecial = /【(隱藏|覺醒|金剛|觀想)】/.test(choice.text);
+                    btn.className = `glass-btn ${isSpecial ? 'special-choice' : ''} w-full px-4 py-3.5 sm:p-4 rounded-xl text-slate-200 tracking-wider text-sm sm:text-base text-left flex justify-between items-center group fade-in`;
+                    btn.style.animationDelay = `${0.12 + index * 0.09}s`;
+
                     let displayText = choice.text;
-                    if (isHidden) displayText = displayText.replace(/【(.*?)】/, "<span class='hidden-tag'>【$1】</span> ");
+                    if (isSpecial) {
+                        displayText = displayText.replace(/【(.*?)】/, "<span class='hidden-tag'>✦ $1</span> ");
+                    }
 
                     btn.innerHTML = `
-                        <span class="pr-4 leading-relaxed">${displayText}</span>
-                        <span class="text-cyan-400/30 text-xl font-bold group-hover:text-cyan-300 transition-colors">›</span>
+                        <div class="flex items-start gap-3 pr-3">
+                            <span class="mt-1.5 text-[10px] ${isSpecial ? 'text-amber-300' : 'text-cyan-300/50'} group-hover:rotate-45 group-hover:text-amber-200 transition-all duration-300 shrink-0">◇</span>
+                            <span class="leading-relaxed font-light group-hover:text-white transition-colors">${displayText}</span>
+                        </div>
+                        <span class="text-white/25 text-lg font-light group-hover:text-amber-200 group-hover:translate-x-0.5 transition-all shrink-0">›</span>
                     `;
-                    
+
                     btn.onclick = () => {
+                        if (isTransitioning && !choice.text.includes("查看命運星辰圖")) return;
+
+                        const prevStats = { enl: state.enl, mer: state.mer, att: state.att, loop: state.loop };
                         const nextNodeId = choice.action();
-                        updateUI();
-                        document.getElementById('scroll-area').scrollTo({ top: 0, behavior: 'smooth' });
-                        renderNode(nextNodeId);
+
+                        if (nextNodeId) {
+                            // 依據玩家心念選擇決定下一顆星辰的光色與頌缽共鳴音律
+                            const dEnl = state.enl - prevStats.enl;
+                            const dMer = state.mer - prevStats.mer;
+                            const dAtt = state.att - prevStats.att;
+
+                            if (isSpecial && !choice.text.includes("查看命運星辰圖")) {
+                                pendingStarColor = { ...THEME_PALETTES.purple };
+                                ZenAudio.playBowl('special');
+                            } else if (dEnl >= dMer && dEnl > dAtt && dEnl > 0) {
+                                pendingStarColor = { ...THEME_PALETTES.cyan };
+                                ZenAudio.playBowl('enl');
+                            } else if (dMer > dEnl && dMer >= dAtt && dMer > 0) {
+                                pendingStarColor = { ...THEME_PALETTES.gold };
+                                ZenAudio.playBowl('mer');
+                            } else if (dAtt > 0) {
+                                pendingStarColor = { ...THEME_PALETTES.red };
+                                ZenAudio.playBowl('att');
+                            } else {
+                                pendingStarColor = { ...THEME_PALETTES.white };
+                                ZenAudio.playBowl('enl');
+                            }
+
+                            updateUI(prevStats);
+                            document.getElementById('scroll-area').scrollTo({ top: 0, behavior: 'smooth' });
+                            renderNode(nextNodeId);
+                        }
                     };
 
                     choicesContainer.appendChild(btn);
                 });
             }
+
+            isTransitioning = false;
         }
 
         // --- Init ---
         window.onload = () => {
+            requestAnimationFrame(masterAnimateLoop);
             initRun();
             updateUI();
             renderNode('start');
